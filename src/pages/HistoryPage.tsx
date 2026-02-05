@@ -1,0 +1,101 @@
+import { useState } from "react";
+import { BottomNav } from "@/components/BottomNav";
+import { CollectionCard } from "@/components/CollectionCard";
+import { Button } from "@/components/ui/button";
+import { Filter, Calendar, TrendingUp, Weight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const allCollections = [
+  { date: "Feb 4, 2026", location: "GreenHub Collection Center", weight: 5.2, points: 520, status: "completed" as const },
+  { date: "Feb 1, 2026", location: "EcoPoint Mall Station", weight: 3.8, points: 380, status: "verified" as const },
+  { date: "Jan 28, 2026", location: "RecycleMax Downtown", weight: 7.1, points: 710, status: "completed" as const },
+  { date: "Jan 25, 2026", location: "GreenHub Collection Center", weight: 2.5, points: 250, status: "completed" as const },
+  { date: "Jan 20, 2026", location: "Community Green Point", weight: 4.2, points: 420, status: "completed" as const },
+  { date: "Jan 15, 2026", location: "EcoPoint Mall Station", weight: 6.0, points: 600, status: "pending" as const },
+];
+
+const filters = ["All", "Completed", "Verified", "Pending"];
+
+export const HistoryPage = () => {
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const filteredCollections = allCollections.filter((c) => {
+    if (activeFilter === "All") return true;
+    return c.status === activeFilter.toLowerCase();
+  });
+
+  const totalWeight = allCollections.reduce((sum, c) => sum + c.weight, 0);
+  const totalPoints = allCollections.reduce((sum, c) => sum + c.points, 0);
+
+  return (
+    <div className="min-h-screen bg-background pb-24">
+      {/* Header */}
+      <header className="bg-card px-6 pb-6 pt-8 shadow-soft">
+        <h1 className="text-2xl font-bold text-foreground">Collection History</h1>
+        <p className="text-sm text-muted-foreground">Track your environmental impact</p>
+
+        {/* Stats summary */}
+        <div className="mt-6 grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-3 rounded-2xl bg-primary/10 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <Weight className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Total Collected</p>
+              <p className="text-lg font-bold text-foreground">{totalWeight.toFixed(1)} kg</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-2xl bg-secondary/10 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
+              <TrendingUp className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Points Earned</p>
+              <p className="text-lg font-bold text-foreground">{totalPoints.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Filters */}
+      <div className="flex items-center gap-2 overflow-x-auto px-4 py-4 no-scrollbar">
+        {filters.map((filter) => (
+          <Button
+            key={filter}
+            variant={activeFilter === filter ? "default" : "outline"}
+            size="sm"
+            onClick={() => setActiveFilter(filter)}
+            className="shrink-0"
+          >
+            {filter}
+          </Button>
+        ))}
+        <Button variant="ghost" size="icon" className="shrink-0 ml-auto">
+          <Filter className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Collections list */}
+      <main className="px-4">
+        <div className="space-y-3">
+          {filteredCollections.map((collection, index) => (
+            <CollectionCard key={index} {...collection} />
+          ))}
+        </div>
+
+        {filteredCollections.length === 0 && (
+          <div className="mt-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+              <Calendar className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground">No collections found</p>
+          </div>
+        )}
+      </main>
+
+      <BottomNav />
+    </div>
+  );
+};
+
+export default HistoryPage;
