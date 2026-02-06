@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
-import { Icon, LatLngExpression } from "leaflet";
+import { Icon } from "leaflet";
+import type { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
 
