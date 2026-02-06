@@ -2,12 +2,13 @@ import { BottomNav } from "@/components/BottomNav";
 import { RewardCard } from "@/components/RewardCard";
 import { RedemptionDialog } from "@/components/RedemptionDialog";
 import { Button } from "@/components/ui/button";
-import { Smartphone, ShoppingBag, Banknote, Heart, Gift, Coins, Loader2 } from "lucide-react";
+import { Smartphone, ShoppingBag, Banknote, Heart, Gift, Coins, Loader2, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const categories = ["All", "Airtime", "Vouchers", "Cash", "Donate"];
 
@@ -104,6 +105,7 @@ interface SelectedReward {
 
 export const RewardsPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedReward, setSelectedReward] = useState<SelectedReward | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -194,7 +196,15 @@ export const RewardsPage = () => {
               )}
             </div>
           </div>
-          <Gift className="h-8 w-8 opacity-50" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-primary-foreground hover:bg-white/10"
+            onClick={() => navigate("/redemption-history")}
+            title="Redemption History"
+          >
+            <History className="h-6 w-6" />
+          </Button>
         </div>
       </header>
 
