@@ -11,14 +11,14 @@ import { Leaf, Droplet, TreeDeciduous } from "lucide-react";
 const recentCollections = [
   {
     date: "Feb 4, 2026",
-    location: "GreenHub Collection Center",
+    location: "EcoRecycle Westlands, Nairobi",
     weight: 5.2,
     points: 520,
     status: "completed" as const,
   },
   {
     date: "Feb 1, 2026",
-    location: "EcoPoint Mall Station",
+    location: "PlastiCollect CBD, Nairobi",
     weight: 3.8,
     points: 380,
     status: "verified" as const,
@@ -26,16 +26,17 @@ const recentCollections = [
 ];
 
 const badges = [
-  { icon: Leaf, label: "First Step", unlocked: true },
+  { icon: Leaf, label: "Mwanzo", unlocked: true },
   { icon: Recycle, label: "10kg Hero", unlocked: true },
-  { icon: Droplet, label: "Ocean Saver", unlocked: true },
-  { icon: TreeDeciduous, label: "Forest Friend", unlocked: false },
+  { icon: Droplet, label: "Bahari Saver", unlocked: true },
+  { icon: TreeDeciduous, label: "Miti Friend", unlocked: false },
 ];
 
 export const Dashboard = () => {
   const monthlyGoal = 50; // kg
   const currentProgress = 32.5; // kg
   const progressPercent = (currentProgress / monthlyGoal) * 100;
+  const pointsValue = 4850; // 1 point = 1 KES
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -43,11 +44,11 @@ export const Dashboard = () => {
       <header className="gradient-hero px-6 pb-24 pt-8 text-primary-foreground">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm opacity-80">Welcome back,</p>
-            <h1 className="text-2xl font-bold">Sarah Green</h1>
+            <p className="text-sm opacity-80">Karibu,</p>
+            <h1 className="text-2xl font-bold">Wanjiku Mwangi</h1>
           </div>
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
-            <span className="text-lg font-bold">SG</span>
+            <span className="text-lg font-bold">WM</span>
           </div>
         </div>
 
@@ -55,7 +56,8 @@ export const Dashboard = () => {
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
           <div>
             <p className="text-sm opacity-80">Total Points</p>
-            <p className="text-3xl font-bold">4,850</p>
+            <p className="text-3xl font-bold">{pointsValue.toLocaleString()}</p>
+            <p className="text-xs opacity-60">≈ KES {pointsValue.toLocaleString()}</p>
           </div>
           <Button variant="glass" size="sm">
             Redeem
@@ -78,7 +80,7 @@ export const Dashboard = () => {
             icon={TrendingUp}
             label="Impact Score"
             value="A+"
-            subtext="Top 10% collector"
+            subtext="Top 10% in Kenya"
             variant="accent"
           />
         </div>

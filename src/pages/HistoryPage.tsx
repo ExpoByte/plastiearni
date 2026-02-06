@@ -6,12 +6,12 @@ import { Filter, Calendar, TrendingUp, Weight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const allCollections = [
-  { date: "Feb 4, 2026", location: "GreenHub Collection Center", weight: 5.2, points: 520, status: "completed" as const },
-  { date: "Feb 1, 2026", location: "EcoPoint Mall Station", weight: 3.8, points: 380, status: "verified" as const },
-  { date: "Jan 28, 2026", location: "RecycleMax Downtown", weight: 7.1, points: 710, status: "completed" as const },
-  { date: "Jan 25, 2026", location: "GreenHub Collection Center", weight: 2.5, points: 250, status: "completed" as const },
-  { date: "Jan 20, 2026", location: "Community Green Point", weight: 4.2, points: 420, status: "completed" as const },
-  { date: "Jan 15, 2026", location: "EcoPoint Mall Station", weight: 6.0, points: 600, status: "pending" as const },
+  { date: "Feb 4, 2026", location: "EcoRecycle Westlands, Nairobi", weight: 5.2, points: 520, status: "completed" as const },
+  { date: "Feb 1, 2026", location: "PlastiCollect CBD, Nairobi", weight: 3.8, points: 380, status: "verified" as const },
+  { date: "Jan 28, 2026", location: "GreenPoint Karen, Nairobi", weight: 7.1, points: 710, status: "completed" as const },
+  { date: "Jan 25, 2026", location: "Mama Recyclers Kibera", weight: 2.5, points: 250, status: "completed" as const },
+  { date: "Jan 20, 2026", location: "EcoHub Eastleigh, Nairobi", weight: 4.2, points: 420, status: "completed" as const },
+  { date: "Jan 15, 2026", location: "Taka Taka Solutions, Industrial Area", weight: 6.0, points: 600, status: "pending" as const },
 ];
 
 const filters = ["All", "Completed", "Verified", "Pending"];
@@ -32,7 +32,7 @@ export const HistoryPage = () => {
       {/* Header */}
       <header className="bg-card px-6 pb-6 pt-8 shadow-soft">
         <h1 className="text-2xl font-bold text-foreground">Collection History</h1>
-        <p className="text-sm text-muted-foreground">Track your environmental impact</p>
+        <p className="text-sm text-muted-foreground">Track your environmental impact in Kenya</p>
 
         {/* Stats summary */}
         <div className="mt-6 grid grid-cols-2 gap-4">
@@ -50,7 +50,7 @@ export const HistoryPage = () => {
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Points Earned</p>
+              <p className="text-xs text-muted-foreground">Points (≈ KES)</p>
               <p className="text-lg font-bold text-foreground">{totalPoints.toLocaleString()}</p>
             </div>
           </div>
