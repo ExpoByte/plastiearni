@@ -22,17 +22,17 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const POINTS_PER_KG = 100; // 100 points per kg of plastic
 
 const plasticTypes = [
-  { value: "pet", label: "PET Bottles", labelSw: "Chupa za PET" },
-  { value: "hdpe", label: "HDPE Containers", labelSw: "Vyombo vya HDPE" },
-  { value: "ldpe", label: "LDPE Bags/Films", labelSw: "Mifuko ya LDPE" },
-  { value: "pp", label: "PP Caps/Containers", labelSw: "Vifuniko vya PP" },
-  { value: "mixed", label: "Mixed Plastics", labelSw: "Plastiki Mchanganyiko" },
+  { value: "pet", labelEn: "PET Bottles", labelSw: "Chupa za PET" },
+  { value: "hdpe", labelEn: "HDPE Containers", labelSw: "Vyombo vya HDPE" },
+  { value: "ldpe", labelEn: "LDPE Bags/Films", labelSw: "Mifuko ya LDPE" },
+  { value: "pp", labelEn: "PP Caps/Containers", labelSw: "Vifuniko vya PP" },
+  { value: "mixed", labelEn: "Mixed Plastics", labelSw: "Plastiki Mchanganyiko" },
 ];
 
 export const LogCollectionPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -47,28 +47,6 @@ export const LogCollectionPage = () => {
   const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
 
-  const t = {
-    title: language === "sw" ? "Rekodi Mkusanyiko" : "Log Collection",
-    subtitle: language === "sw" ? "Rekodi plastiki yako uliyokusanya" : "Record your plastic collection",
-    weight: language === "sw" ? "Uzito (kg)" : "Weight (kg)",
-    weightPlaceholder: language === "sw" ? "Ingiza uzito" : "Enter weight",
-    plasticType: language === "sw" ? "Aina ya Plastiki" : "Plastic Type",
-    location: language === "sw" ? "Mahali pa Kukusanya" : "Collection Location",
-    locationPlaceholder: language === "sw" ? "Wapi ulikokusanya" : "Where did you collect?",
-    notes: language === "sw" ? "Maelezo (Si lazima)" : "Notes (Optional)",
-    notesPlaceholder: language === "sw" ? "Maelezo yoyote ya ziada" : "Any additional details",
-    pointsPreview: language === "sw" ? "Pointi Utakazopata" : "Points You'll Earn",
-    submit: language === "sw" ? "Wasilisha Mkusanyiko" : "Submit Collection",
-    successTitle: language === "sw" ? "Hongera!" : "Congratulations!",
-    successMessage: language === "sw" ? "Umepata pointi" : "You've earned points",
-    backToDashboard: language === "sw" ? "Rudi Nyumbani" : "Back to Dashboard",
-    logAnother: language === "sw" ? "Rekodi Nyingine" : "Log Another",
-    photo: language === "sw" ? "Picha ya Uthibitisho" : "Verification Photo",
-    takePhoto: language === "sw" ? "Piga Picha" : "Take Photo",
-    uploadPhoto: language === "sw" ? "Pakia Picha" : "Upload Photo",
-    removePhoto: language === "sw" ? "Ondoa Picha" : "Remove Photo",
-  };
-
   const calculatedPoints = weight ? Math.round(parseFloat(weight) * POINTS_PER_KG) : 0;
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,13 +55,13 @@ export const LogCollectionPage = () => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error(language === "sw" ? "Tafadhali chagua picha" : "Please select an image file");
+      toast.error(t.selectImage);
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error(language === "sw" ? "Picha ni kubwa sana (max 5MB)" : "Image is too large (max 5MB)");
+      toast.error(t.imageTooLarge);
       return;
     }
 
@@ -117,7 +95,7 @@ export const LogCollectionPage = () => {
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
-      toast.error(language === "sw" ? "Imeshindwa kupakia picha" : "Failed to upload photo");
+      toast.error(t.failedSubmit);
       return null;
     }
 
@@ -165,13 +143,13 @@ export const LogCollectionPage = () => {
 
     if (error) {
       console.error("Error submitting collection:", error);
-      toast.error(language === "sw" ? "Imeshindwa kuwasilisha" : "Failed to submit collection");
+      toast.error(t.failedSubmit);
       return;
     }
 
     setEarnedPoints(calculatedPoints);
     setSuccess(true);
-    toast.success(language === "sw" ? "Mkusanyiko umerekodiwa!" : "Collection recorded!");
+    toast.success(t.collectionRecorded);
   };
 
   const handleLogAnother = () => {
@@ -191,8 +169,8 @@ export const LogCollectionPage = () => {
           <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 mb-6">
             <CheckCircle className="h-12 w-12 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">{t.successTitle}</h1>
-          <p className="text-muted-foreground mt-2">{t.successMessage}</p>
+          <h1 className="text-2xl font-bold text-foreground">{t.congratulations}</h1>
+          <p className="text-muted-foreground mt-2">{t.youEarnedPoints}</p>
           <div className="mt-6 flex items-center gap-2 rounded-2xl bg-primary/10 px-8 py-4">
             <Coins className="h-8 w-8 text-primary" />
             <span className="text-4xl font-bold text-primary">+{earnedPoints}</span>
@@ -218,10 +196,10 @@ export const LogCollectionPage = () => {
       <header className="gradient-hero px-6 pb-8 pt-8 text-primary-foreground">
         <button onClick={() => navigate(-1)} className="mb-4 flex items-center gap-2 opacity-80 hover:opacity-100">
           <ArrowLeft className="h-5 w-5" />
-          <span>{language === "sw" ? "Rudi" : "Back"}</span>
+          <span>{t.back}</span>
         </button>
-        <h1 className="text-2xl font-bold">{t.title}</h1>
-        <p className="text-sm opacity-80">{t.subtitle}</p>
+        <h1 className="text-2xl font-bold">{t.logCollectionTitle}</h1>
+        <p className="text-sm opacity-80">{t.recordCollection}</p>
       </header>
 
       <main className="px-4 -mt-4">
@@ -237,7 +215,7 @@ export const LogCollectionPage = () => {
               type="number"
               step="0.1"
               min="0.1"
-              placeholder={t.weightPlaceholder}
+              placeholder={t.enterWeight}
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               required
@@ -258,7 +236,7 @@ export const LogCollectionPage = () => {
               <SelectContent>
                 {plasticTypes.map((type) => (
                   <SelectItem key={type.value} value={type.value}>
-                    {language === "sw" ? type.labelSw : type.label}
+                    {language === "sw" ? type.labelSw : type.labelEn}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -269,11 +247,11 @@ export const LogCollectionPage = () => {
           <div className="space-y-2">
             <Label htmlFor="location" className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-primary" />
-              {t.location}
+              {t.collectionLocation}
             </Label>
             <Input
               id="location"
-              placeholder={t.locationPlaceholder}
+              placeholder={t.whereCollected}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
@@ -281,10 +259,10 @@ export const LogCollectionPage = () => {
 
           {/* Notes Textarea */}
           <div className="space-y-2">
-            <Label htmlFor="notes">{t.notes}</Label>
+            <Label htmlFor="notes">{t.notesOptional}</Label>
             <Textarea
               id="notes"
-              placeholder={t.notesPlaceholder}
+              placeholder={t.additionalDetails}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
@@ -295,7 +273,7 @@ export const LogCollectionPage = () => {
           <div className="space-y-3">
             <Label className="flex items-center gap-2">
               <ImageIcon className="h-4 w-4 text-primary" />
-              {t.photo}
+              {t.verificationPhoto}
             </Label>
             
             {photoPreview ? (
@@ -359,7 +337,7 @@ export const LogCollectionPage = () => {
 
           {/* Points Preview */}
           <div className="rounded-2xl bg-primary/10 p-4">
-            <p className="text-sm text-muted-foreground mb-1">{t.pointsPreview}</p>
+            <p className="text-sm text-muted-foreground mb-1">{t.pointsYouEarn}</p>
             <div className="flex items-center gap-2">
               <Coins className="h-6 w-6 text-primary" />
               <span className="text-3xl font-bold text-primary">{calculatedPoints}</span>
@@ -376,12 +354,10 @@ export const LogCollectionPage = () => {
             {loading || uploading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                {uploading 
-                  ? (language === "sw" ? "Inapakia picha..." : "Uploading photo...") 
-                  : (language === "sw" ? "Inawasilisha..." : "Submitting...")}
+                {uploading ? t.uploading : t.submitting}
               </>
             ) : (
-              t.submit
+              t.submitCollection
             )}
           </Button>
         </form>

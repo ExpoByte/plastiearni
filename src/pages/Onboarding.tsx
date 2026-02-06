@@ -3,41 +3,39 @@ import { useNavigate } from "react-router-dom";
 import { Recycle, Coins, MapPin, Gift, ArrowRight, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const slides = [
-  {
-    icon: Recycle,
-    title: "Collect Plastic",
-    description:
-      "Gather plastic waste from your home, community, or anywhere you find it. Every piece counts towards a cleaner planet.",
-    color: "from-primary to-secondary",
-  },
-  {
-    icon: MapPin,
-    title: "Find Drop Points",
-    description:
-      "Use our map to locate the nearest collection points. Our network of recycling partners is always ready to receive your plastics.",
-    color: "from-secondary to-accent",
-  },
-  {
-    icon: Coins,
-    title: "Earn Points",
-    description:
-      "Get rewarded for every kilogram of plastic you collect. Watch your points grow as you help save the environment.",
-    color: "from-primary to-secondary",
-  },
-  {
-    icon: Gift,
-    title: "Redeem Rewards",
-    description:
-      "Exchange your points for airtime, vouchers, or cash. Your environmental efforts pay off in real rewards!",
-    color: "from-secondary to-eco-water",
-  },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const Onboarding = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
+  const { t } = useLanguage();
+
+  const slides = [
+    {
+      icon: Recycle,
+      title: t.collectPlastic,
+      description: t.collectPlasticDesc,
+      color: "from-primary to-secondary",
+    },
+    {
+      icon: MapPin,
+      title: t.findDropPoints,
+      description: t.findDropPointsDesc,
+      color: "from-secondary to-accent",
+    },
+    {
+      icon: Coins,
+      title: t.earnPoints,
+      description: t.earnPointsDesc,
+      color: "from-primary to-secondary",
+    },
+    {
+      icon: Gift,
+      title: t.redeemRewards,
+      description: t.redeemRewardsDesc,
+      color: "from-secondary to-eco-water",
+    },
+  ];
 
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
@@ -59,7 +57,7 @@ export const Onboarding = () => {
       {/* Skip button */}
       <div className="flex justify-end p-4">
         <Button variant="ghost" onClick={skipToHome} className="text-muted-foreground">
-          Skip
+          {t.skip}
         </Button>
       </div>
 
@@ -123,7 +121,7 @@ export const Onboarding = () => {
           size="xl"
           className="w-full gap-2"
         >
-          {currentSlide === slides.length - 1 ? "Get Started" : "Next"}
+          {currentSlide === slides.length - 1 ? t.getStarted : t.next}
           <ArrowRight className="h-5 w-5" />
         </Button>
       </div>

@@ -7,11 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Mail, Lock, Recycle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { lovable } from "@/integrations/lovable";
 
 export const AuthPage = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signIn, signUp } = useAuth();
+  const { t } = useLanguage();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +40,7 @@ export const AuthPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Welcome back!");
+      toast.success(t.welcomeBack);
       navigate("/");
     }
   };
@@ -62,7 +64,7 @@ export const AuthPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Check your email to verify your account!");
+      toast.success(t.checkEmail);
     }
   };
 
@@ -96,21 +98,21 @@ export const AuthPage = () => {
           </div>
         </div>
         <h1 className="text-3xl font-bold">TakaPoints</h1>
-        <p className="text-sm opacity-80 mt-2">Turn trash into treasure</p>
+        <p className="text-sm opacity-80 mt-2">{t.turnTrashToTreasure}</p>
       </header>
 
       {/* Auth form */}
       <div className="flex-1 -mt-6 rounded-t-3xl bg-card px-6 py-8">
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsTrigger value="signin">{t.signIn}</TabsTrigger>
+            <TabsTrigger value="signup">{t.signUp}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="signin">
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="signin-email">Email</Label>
+                <Label htmlFor="signin-email">{t.email}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -125,7 +127,7 @@ export const AuthPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="signin-password">Password</Label>
+                <Label htmlFor="signin-password">{t.password}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -143,7 +145,7 @@ export const AuthPage = () => {
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Sign In"
+                  t.signIn
                 )}
               </Button>
             </form>
@@ -152,7 +154,7 @@ export const AuthPage = () => {
           <TabsContent value="signup">
             <form onSubmit={handleSignUp} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
+                <Label htmlFor="signup-email">{t.email}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -167,7 +169,7 @@ export const AuthPage = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
+                <Label htmlFor="signup-password">{t.password}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -185,7 +187,7 @@ export const AuthPage = () => {
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
-                  "Create Account"
+                  t.createAccount
                 )}
               </Button>
             </form>
@@ -198,7 +200,7 @@ export const AuthPage = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
+                {t.continueWith}
               </span>
             </div>
           </div>
@@ -232,7 +234,7 @@ export const AuthPage = () => {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Continue with Google
+                Google
               </>
             )}
           </Button>
@@ -241,7 +243,7 @@ export const AuthPage = () => {
         {/* Welcome bonus notice */}
         <div className="mt-8 rounded-2xl bg-primary/10 p-4 text-center">
           <p className="text-sm text-primary font-medium">
-            🎉 New users get 500 bonus points!
+            🎉 {t.welcomeBonus}
           </p>
         </div>
       </div>

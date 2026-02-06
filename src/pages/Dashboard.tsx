@@ -13,6 +13,7 @@ import { Leaf, Droplet, TreeDeciduous } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const recentCollections = [
   {
@@ -41,6 +42,7 @@ const badges = [
 export const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ display_name: string | null } | null>(null);
   const [points, setPoints] = useState<{ balance: number; total_earned: number } | null>(null);
@@ -122,7 +124,7 @@ export const Dashboard = () => {
       <header className="gradient-hero px-6 pb-24 pt-8 text-primary-foreground">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm opacity-80">Karibu,</p>
+            <p className="text-sm opacity-80">{t.welcome},</p>
             {loading ? (
               <Loader2 className="h-6 w-6 animate-spin mt-1" />
             ) : (
@@ -137,7 +139,7 @@ export const Dashboard = () => {
         {/* Points display */}
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
           <div>
-            <p className="text-sm opacity-80">Total Points</p>
+            <p className="text-sm opacity-80">{t.totalPoints}</p>
             {loading ? (
               <Loader2 className="h-6 w-6 animate-spin mt-1" />
             ) : (
@@ -148,7 +150,7 @@ export const Dashboard = () => {
             )}
           </div>
           <Button variant="glass" size="sm" onClick={() => navigate("/rewards")}>
-            Redeem
+            {t.redeem}
           </Button>
         </div>
       </header>
@@ -159,16 +161,16 @@ export const Dashboard = () => {
         <div className="grid grid-cols-2 gap-4">
           <StatCard
             icon={Weight}
-            label="Total Collected"
+            label={t.totalCollected}
             value="32.5 kg"
-            subtext="This month"
+            subtext={t.thisMonth}
             variant="primary"
           />
           <StatCard
             icon={TrendingUp}
-            label="Impact Score"
+            label={t.impactScore}
             value="A+"
-            subtext="Top 10% in Kenya"
+            subtext={t.topInKenya}
             variant="accent"
           />
         </div>
@@ -177,7 +179,7 @@ export const Dashboard = () => {
         <div className="mt-6 rounded-3xl bg-card p-6 shadow-card animate-fade-in">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-foreground">Monthly Goal</h2>
+              <h2 className="text-lg font-bold text-foreground">{t.monthlyGoal}</h2>
               <p className="text-sm text-muted-foreground">
                 {currentProgress} / {monthlyGoal} kg
               </p>
@@ -197,18 +199,18 @@ export const Dashboard = () => {
             />
           </div>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            {monthlyGoal - currentProgress} kg more to reach your goal! 🎯
+            {monthlyGoal - currentProgress} {t.moreToGoal} 🎯
           </p>
         </div>
 
         {/* Quick actions */}
         <div className="mt-6">
-          <h2 className="mb-4 text-lg font-bold text-foreground">Quick Actions</h2>
+          <h2 className="mb-4 text-lg font-bold text-foreground">{t.quickActions}</h2>
           <div className="grid grid-cols-4 gap-2">
-            <QuickAction icon={Plus} label="Log Collection" to="/log" color="primary" />
-            <QuickAction icon={MapPin} label="Find Points" to="/map" color="secondary" />
-            <QuickAction icon={Gift} label="Rewards" to="/rewards" color="accent" />
-            <QuickAction icon={History} label="History" to="/history" color="primary" />
+            <QuickAction icon={Plus} label={t.logCollection} to="/log" color="primary" />
+            <QuickAction icon={MapPin} label={t.findPoints} to="/map" color="secondary" />
+            <QuickAction icon={Gift} label={t.rewards} to="/rewards" color="accent" />
+            <QuickAction icon={History} label={t.history} to="/history" color="primary" />
           </div>
         </div>
 
@@ -218,9 +220,9 @@ export const Dashboard = () => {
         {/* Badges */}
         <div className="mt-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-foreground">Your Badges</h2>
+            <h2 className="text-lg font-bold text-foreground">{t.yourBadges}</h2>
             <Button variant="ghost" size="sm" className="text-primary">
-              View All
+              {t.viewAll}
             </Button>
           </div>
           <div className="mt-4 flex justify-between">
@@ -233,9 +235,9 @@ export const Dashboard = () => {
         {/* Recent collections */}
         <div className="mt-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-foreground">Recent Activity</h2>
+            <h2 className="text-lg font-bold text-foreground">{t.recentActivity}</h2>
             <Button variant="ghost" size="sm" className="text-primary">
-              See All
+              {t.seeAll}
             </Button>
           </div>
           <div className="mt-4 space-y-3">
