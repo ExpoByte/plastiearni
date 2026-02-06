@@ -72,6 +72,35 @@ export const Dashboard = () => {
     };
 
     fetchUserData();
+
+    // Subscribe to realtime updates for user_points
+    if (!user) return;
+
+    const channel = supabase
+      .channel('dashboard-points')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_points',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log('Points updated:', payload);
+          if (payload.new && typeof payload.new === 'object' && 'balance' in payload.new) {
+            setPoints({
+              balance: payload.new.balance as number,
+              total_earned: (payload.new as { total_earned: number }).total_earned,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const getInitials = (name: string | null | undefined) => {
