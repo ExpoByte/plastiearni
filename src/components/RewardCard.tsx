@@ -9,6 +9,7 @@ interface RewardCardProps {
   points: number;
   category: "airtime" | "voucher" | "cash" | "donation";
   available?: boolean;
+  onRedeem?: () => void;
 }
 
 export const RewardCard = ({
@@ -18,6 +19,7 @@ export const RewardCard = ({
   points,
   category,
   available = true,
+  onRedeem,
 }: RewardCardProps) => {
   const categoryColors = {
     airtime: "from-eco-water to-accent",
@@ -56,6 +58,7 @@ export const RewardCard = ({
               size="sm"
               variant={available ? "default" : "outline"}
               disabled={!available}
+              onClick={onRedeem}
             >
               {available ? "Redeem" : "Locked"}
             </Button>
