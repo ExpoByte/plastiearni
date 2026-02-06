@@ -1,7 +1,7 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import { Icon, LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { useEffect } from "react";
+import { useEffect, forwardRef, useImperativeHandle } from "react";
 
 // Fix for default marker icons in React-Leaflet
 const defaultIcon = new Icon({
@@ -60,84 +60,134 @@ interface MapViewProps {
   onSelectPoint: (point: CollectionPoint) => void;
   userLocation: LatLngExpression;
   useSatellite?: boolean;
+  accuracy?: number | null;
+  isGpsActive?: boolean;
+}
+
+export interface MapViewRef {
+  centerOnUser: () => void;
 }
 
 // Component to handle map centering when selection changes
-const MapController = ({ center }: { center: LatLngExpression }) => {
+const MapController = ({ center, zoom = 15 }: { center: LatLngExpression; zoom?: number }) => {
   const map = useMap();
   
   useEffect(() => {
-    map.flyTo(center, 15, { duration: 0.5 });
-  }, [center, map]);
+    map.flyTo(center, zoom, { duration: 0.5 });
+  }, [center, zoom, map]);
   
   return null;
 };
 
-export const MapView = ({
-  collectionPoints,
-  selectedPoint,
-  onSelectPoint,
-  userLocation,
-  useSatellite = false,
-}: MapViewProps) => {
-  const tileUrl = useSatellite
-    ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+// Internal component to expose map methods
+const MapMethods = forwardRef<MapViewRef, { userLocation: LatLngExpression }>(
+  ({ userLocation }, ref) => {
+    const map = useMap();
+    
+    useImperativeHandle(ref, () => ({
+      centerOnUser: () => {
+        map.flyTo(userLocation, 16, { duration: 0.5 });
+      },
+    }));
+    
+    return null;
+  }
+);
 
-  const attribution = useSatellite
-    ? "Tiles &copy; Esri"
-    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+export const MapView = forwardRef<MapViewRef, MapViewProps>(
+  (
+    {
+      collectionPoints,
+      selectedPoint,
+      onSelectPoint,
+      userLocation,
+      useSatellite = false,
+      accuracy = null,
+      isGpsActive = false,
+    },
+    ref
+  ) => {
+    const tileUrl = useSatellite
+      ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+      : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
-  const mapCenter = selectedPoint 
-    ? [selectedPoint.lat, selectedPoint.lng] as LatLngExpression
-    : userLocation;
+    const attribution = useSatellite
+      ? "Tiles &copy; Esri"
+      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-  return (
-    <MapContainer
-      center={userLocation}
-      zoom={13}
-      className="h-full w-full z-0"
-      style={{ height: "100%", width: "100%" }}
-    >
-      <TileLayer url={tileUrl} attribution={attribution} />
-      
-      {selectedPoint && <MapController center={mapCenter} />}
-      
-      {/* User location marker */}
-      <Marker position={userLocation} icon={userIcon}>
-        <Popup>
-          <div className="text-center">
-            <strong>Your Location</strong>
-            <p className="text-sm text-muted-foreground">Nairobi, Kenya</p>
-          </div>
-        </Popup>
-      </Marker>
+    const mapCenter = selectedPoint
+      ? ([selectedPoint.lat, selectedPoint.lng] as LatLngExpression)
+      : userLocation;
 
-      {/* Collection point markers */}
-      {collectionPoints.map((point) => (
-        <Marker
-          key={point.id}
-          position={[point.lat, point.lng]}
-          icon={point.isOpen ? activeIcon : closedIcon}
-          eventHandlers={{
-            click: () => onSelectPoint(point),
-          }}
-        >
+    return (
+      <MapContainer
+        center={userLocation}
+        zoom={13}
+        className="h-full w-full z-0"
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer url={tileUrl} attribution={attribution} />
+
+        <MapMethods ref={ref} userLocation={userLocation} />
+
+        {selectedPoint && <MapController center={mapCenter} />}
+
+        {/* GPS accuracy circle */}
+        {isGpsActive && accuracy && (
+          <Circle
+            center={userLocation}
+            radius={accuracy}
+            pathOptions={{
+              color: "#4FC3F7",
+              fillColor: "#4FC3F7",
+              fillOpacity: 0.15,
+              weight: 2,
+            }}
+          />
+        )}
+
+        {/* User location marker */}
+        <Marker position={userLocation} icon={userIcon}>
           <Popup>
-            <div className="min-w-[200px]">
-              <strong className="text-foreground">{point.name}</strong>
-              <p className="text-sm text-muted-foreground">{point.address}</p>
-              <p className="text-sm">
-                <span className={point.isOpen ? "text-primary" : "text-destructive"}>
-                  {point.isOpen ? "Open" : "Closed"}
-                </span>
-                {" • "}
-                <span>⭐ {point.rating}</span>
-              </p>
+            <div className="text-center">
+              <strong>Your Location</strong>
+              {isGpsActive ? (
+                <p className="text-sm text-muted-foreground">
+                  GPS Active {accuracy && `(±${Math.round(accuracy)}m)`}
+                </p>
+              ) : (
+                <p className="text-sm text-muted-foreground">Default: Nairobi, Kenya</p>
+              )}
             </div>
           </Popup>
         </Marker>
-      ))}
-    </MapContainer>
-  );
-};
+
+        {/* Collection point markers */}
+        {collectionPoints.map((point) => (
+          <Marker
+            key={point.id}
+            position={[point.lat, point.lng]}
+            icon={point.isOpen ? activeIcon : closedIcon}
+            eventHandlers={{
+              click: () => onSelectPoint(point),
+            }}
+          >
+            <Popup>
+              <div className="min-w-[200px]">
+                <strong className="text-foreground">{point.name}</strong>
+                <p className="text-sm text-muted-foreground">{point.address}</p>
+                <p className="text-sm">
+                  <span className={point.isOpen ? "text-primary" : "text-destructive"}>
+                    {point.isOpen ? "Open" : "Closed"}
+                  </span>
+                  {" • "}
+                  <span>⭐ {point.rating}</span>
+                </p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+    );
+  }
+);
