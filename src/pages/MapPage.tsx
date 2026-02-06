@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useCallback } from "react";
 import { BottomNav } from "@/components/BottomNav";
 import { Button } from "@/components/ui/button";
 import { MapPin, Satellite, Map as MapIcon, Crosshair, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MapView, CollectionPoint, MapViewRef } from "@/components/map/MapView";
+import { MapView, CollectionPoint } from "@/components/map/MapView";
 import { CollectionPointCard } from "@/components/map/CollectionPointCard";
 import { PointDetailSheet } from "@/components/map/PointDetailSheet";
 import { kenyaCollectionPoints, NAIROBI_CENTER } from "@/data/kenyaCollectionPoints";
@@ -15,7 +15,7 @@ export const MapPage = () => {
   const [selectedPoint, setSelectedPoint] = useState<CollectionPoint | null>(null);
   const [showList, setShowList] = useState(true);
   const [useSatellite, setUseSatellite] = useState(false);
-  const mapRef = useRef<MapViewRef>(null);
+  const [centerOnUser, setCenterOnUser] = useState(false);
 
   const { latitude, longitude, accuracy, loading, error, refresh } = useGeolocation();
 
@@ -24,6 +24,10 @@ export const MapPage = () => {
   const userLocation: LatLngExpression = isGpsActive
     ? [latitude, longitude]
     : [NAIROBI_CENTER.lat, NAIROBI_CENTER.lng];
+
+  const handleCenterComplete = useCallback(() => {
+    setCenterOnUser(false);
+  }, []);
 
   const handleLocateMe = () => {
     if (loading) return;
@@ -35,7 +39,7 @@ export const MapPage = () => {
     }
 
     if (isGpsActive) {
-      mapRef.current?.centerOnUser();
+      setCenterOnUser(true);
       toast.success(`Location found (±${Math.round(accuracy || 0)}m accuracy)`);
     } else {
       refresh();
@@ -48,7 +52,6 @@ export const MapPage = () => {
       {/* Map container */}
       <div className="relative h-[50vh]">
         <MapView
-          ref={mapRef}
           collectionPoints={kenyaCollectionPoints}
           selectedPoint={selectedPoint}
           onSelectPoint={setSelectedPoint}
@@ -56,6 +59,8 @@ export const MapPage = () => {
           useSatellite={useSatellite}
           accuracy={accuracy}
           isGpsActive={isGpsActive}
+          centerOnUser={centerOnUser}
+          onCenterComplete={handleCenterComplete}
         />
 
         {/* Map controls */}
