@@ -229,21 +229,22 @@ export type Database = {
       }
     }
     Views: {
-      admin_stats: {
-        Row: {
-          active_announcements: number | null
-          successful_redemptions: number | null
-          total_collections: number | null
-          total_kg_collected: number | null
-          total_points_balance: number | null
-          total_points_earned: number | null
-          total_redemptions: number | null
-          total_users: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_admin_stats: {
+        Args: never
+        Returns: {
+          active_announcements: number
+          successful_redemptions: number
+          total_collections: number
+          total_kg_collected: number
+          total_points_balance: number
+          total_points_earned: number
+          total_redemptions: number
+          total_users: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
