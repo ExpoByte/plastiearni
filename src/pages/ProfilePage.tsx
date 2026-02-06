@@ -26,14 +26,16 @@ const menuItems = [
 ];
 
 const allBadges = [
-  { icon: Leaf, label: "First Step", unlocked: true },
+  { icon: Leaf, label: "Mwanzo", unlocked: true },
   { icon: Recycle, label: "10kg Hero", unlocked: true },
-  { icon: Droplet, label: "Ocean Saver", unlocked: true },
-  { icon: TreeDeciduous, label: "Forest Friend", unlocked: false },
+  { icon: Droplet, label: "Bahari Saver", unlocked: true },
+  { icon: TreeDeciduous, label: "Miti Friend", unlocked: false },
   { icon: Award, label: "Champion", unlocked: false },
 ];
 
 export const ProfilePage = () => {
+  const totalPoints = 4850;
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
@@ -51,11 +53,12 @@ export const ProfilePage = () => {
         <div className="rounded-3xl bg-card p-6 shadow-card text-center">
           {/* Avatar */}
           <div className="mx-auto -mt-16 mb-4 flex h-24 w-24 items-center justify-center rounded-full gradient-primary text-3xl font-bold text-primary-foreground shadow-elevated ring-4 ring-card">
-            SG
+            WM
           </div>
 
-          <h2 className="text-xl font-bold text-foreground">Sarah Green</h2>
+          <h2 className="text-xl font-bold text-foreground">Wanjiku Mwangi</h2>
           <p className="text-sm text-muted-foreground">Eco Warrior since January 2025</p>
+          <p className="text-xs text-muted-foreground mt-1">📍 Nairobi, Kenya</p>
 
           {/* Stats */}
           <div className="mt-6 grid grid-cols-3 gap-4">
@@ -64,8 +67,9 @@ export const ProfilePage = () => {
               <p className="text-xs text-muted-foreground">kg collected</p>
             </div>
             <div className="rounded-2xl bg-secondary/10 p-3">
-              <p className="text-2xl font-bold text-secondary">4,850</p>
+              <p className="text-2xl font-bold text-secondary">{totalPoints.toLocaleString()}</p>
               <p className="text-xs text-muted-foreground">points</p>
+              <p className="text-[10px] text-muted-foreground">≈ KES {totalPoints.toLocaleString()}</p>
             </div>
             <div className="rounded-2xl bg-accent/20 p-3">
               <p className="text-2xl font-bold text-accent-foreground">3</p>
