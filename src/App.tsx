@@ -16,6 +16,7 @@ import LogCollectionPage from "./pages/LogCollectionPage";
 import MapPage from "./pages/MapPage";
 import ProfilePage from "./pages/ProfilePage";
 import AssistantPage from "./pages/AssistantPage";
+import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -93,6 +94,14 @@ const App = () => (
             element={
               <AuthGuard>
                 <AssistantPage />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <AuthGuard>
+                <AdminPage />
               </AuthGuard>
             }
           />
