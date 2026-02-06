@@ -1,4 +1,5 @@
 import { BottomNav } from "@/components/BottomNav";
+import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
 import { RewardCard } from "@/components/RewardCard";
 import { RedemptionDialog } from "@/components/RedemptionDialog";
 import { Button } from "@/components/ui/button";
@@ -249,6 +250,7 @@ export const RewardsPage = () => {
         onSuccess={handleRedemptionSuccess}
       />
 
+      <FloatingAssistantButton />
       <BottomNav />
     </div>
   );
