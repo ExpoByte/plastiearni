@@ -2,9 +2,12 @@ import { BottomNav } from "@/components/BottomNav";
 import { RewardCard } from "@/components/RewardCard";
 import { RedemptionDialog } from "@/components/RedemptionDialog";
 import { Button } from "@/components/ui/button";
-import { Smartphone, ShoppingBag, Banknote, Heart, Gift, Coins } from "lucide-react";
+import { Smartphone, ShoppingBag, Banknote, Heart, Gift, Coins, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const categories = ["All", "Airtime", "Vouchers", "Cash", "Donate"];
 
@@ -100,10 +103,34 @@ interface SelectedReward {
 }
 
 export const RewardsPage = () => {
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedReward, setSelectedReward] = useState<SelectedReward | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const userPoints = 4850;
+  const [userPoints, setUserPoints] = useState<number | null>(null);
+  const [loadingPoints, setLoadingPoints] = useState(true);
+
+  useEffect(() => {
+    const fetchPoints = async () => {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from("user_points")
+        .select("balance")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching points:", error);
+        toast.error("Failed to load points balance");
+      }
+      
+      setUserPoints(data?.balance ?? 0);
+      setLoadingPoints(false);
+    };
+
+    fetchPoints();
+  }, [user]);
 
   const filteredRewards = rewards.filter((r) => {
     if (activeCategory === "All") return true;
@@ -116,6 +143,20 @@ export const RewardsPage = () => {
     return r.category === categoryMap[activeCategory];
   });
 
+  const handleRedemptionSuccess = () => {
+    // Refresh points after successful redemption
+    if (user) {
+      supabase
+        .from("user_points")
+        .select("balance")
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          setUserPoints(data?.balance ?? 0);
+        });
+    }
+  };
+
   const handleRedeem = (reward: typeof rewards[0]) => {
     setSelectedReward({
       title: reward.title,
@@ -125,6 +166,8 @@ export const RewardsPage = () => {
     });
     setDialogOpen(true);
   };
+
+  const displayPoints = userPoints ?? 0;
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -141,8 +184,14 @@ export const RewardsPage = () => {
             </div>
             <div>
               <p className="text-sm opacity-80">Available Points</p>
-              <p className="text-2xl font-bold">{userPoints.toLocaleString()}</p>
-              <p className="text-xs opacity-60">≈ KES {userPoints.toLocaleString()}</p>
+              {loadingPoints ? (
+                <Loader2 className="h-6 w-6 animate-spin mt-1" />
+              ) : (
+                <>
+                  <p className="text-2xl font-bold">{displayPoints.toLocaleString()}</p>
+                  <p className="text-xs opacity-60">≈ KES {displayPoints.toLocaleString()}</p>
+                </>
+              )}
             </div>
           </div>
           <Gift className="h-8 w-8 opacity-50" />
@@ -175,7 +224,7 @@ export const RewardsPage = () => {
               description={reward.description}
               points={reward.points}
               category={reward.category}
-              available={reward.available && userPoints >= reward.points}
+              available={reward.available && displayPoints >= reward.points}
               onRedeem={() => handleRedeem(reward)}
             />
           ))}
@@ -187,6 +236,7 @@ export const RewardsPage = () => {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         reward={selectedReward}
+        onSuccess={handleRedemptionSuccess}
       />
 
       <BottomNav />
