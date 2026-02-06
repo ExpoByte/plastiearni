@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      redemptions: {
+        Row: {
+          amount_kes: number
+          created_at: string
+          error_message: string | null
+          id: string
+          mpesa_transaction_id: string | null
+          phone_number: string
+          points_spent: number
+          reward_category: string
+          reward_title: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_kes: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          mpesa_transaction_id?: string | null
+          phone_number: string
+          points_spent: number
+          reward_category: string
+          reward_title: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_kes?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          mpesa_transaction_id?: string | null
+          phone_number?: string
+          points_spent?: number
+          reward_category?: string
+          reward_title?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_points: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          total_earned: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          total_earned?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          total_earned?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
