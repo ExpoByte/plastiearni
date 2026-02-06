@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import HistoryPage from "./pages/HistoryPage";
@@ -24,7 +25,14 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/rewards" element={<RewardsPage />} />
-          <Route path="/map" element={<MapPage />} />
+          <Route
+            path="/map"
+            element={
+              <ErrorBoundary>
+                <MapPage />
+              </ErrorBoundary>
+            }
+          />
           <Route path="/profile" element={<ProfilePage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
@@ -35,3 +43,4 @@ const App = () => (
 );
 
 export default App;
+
