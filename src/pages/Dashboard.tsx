@@ -1,5 +1,6 @@
 import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
+import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
 import { StatCard } from "@/components/StatCard";
 import { ProgressRing } from "@/components/ProgressRing";
 import { QuickAction } from "@/components/QuickAction";
@@ -155,6 +156,7 @@ export const Dashboard = () => {
         </div>
       </main>
 
+      <FloatingAssistantButton />
       <BottomNav />
     </div>
   );
