@@ -10,6 +10,7 @@ import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import HistoryPage from "./pages/HistoryPage";
 import RewardsPage from "./pages/RewardsPage";
+import RedemptionHistoryPage from "./pages/RedemptionHistoryPage";
 import MapPage from "./pages/MapPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
@@ -46,6 +47,14 @@ const App = () => (
             element={
               <AuthGuard>
                 <RewardsPage />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/redemption-history"
+            element={
+              <AuthGuard>
+                <RedemptionHistoryPage />
               </AuthGuard>
             }
           />
