@@ -20,6 +20,7 @@ export type Database = {
           id: string
           location: string | null
           notes: string | null
+          photo_url: string | null
           plastic_type: string
           points_earned: number
           status: string
@@ -32,6 +33,7 @@ export type Database = {
           id?: string
           location?: string | null
           notes?: string | null
+          photo_url?: string | null
           plastic_type?: string
           points_earned: number
           status?: string
@@ -44,6 +46,7 @@ export type Database = {
           id?: string
           location?: string | null
           notes?: string | null
+          photo_url?: string | null
           plastic_type?: string
           points_earned?: number
           status?: string
