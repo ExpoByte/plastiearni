@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      collections: {
+        Row: {
+          created_at: string
+          id: string
+          location: string | null
+          notes: string | null
+          plastic_type: string
+          points_earned: number
+          status: string
+          updated_at: string
+          user_id: string
+          weight_kg: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          plastic_type?: string
+          points_earned: number
+          status?: string
+          updated_at?: string
+          user_id: string
+          weight_kg: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          plastic_type?: string
+          points_earned?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

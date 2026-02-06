@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import HistoryPage from "./pages/HistoryPage";
 import RewardsPage from "./pages/RewardsPage";
 import RedemptionHistoryPage from "./pages/RedemptionHistoryPage";
+import LogCollectionPage from "./pages/LogCollectionPage";
 import MapPage from "./pages/MapPage";
 import ProfilePage from "./pages/ProfilePage";
 import AssistantPage from "./pages/AssistantPage";
@@ -58,6 +59,14 @@ const App = () => (
               element={
                 <AuthGuard>
                   <RedemptionHistoryPage />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/log"
+              element={
+                <AuthGuard>
+                  <LogCollectionPage />
                 </AuthGuard>
               }
             />
