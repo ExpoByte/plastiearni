@@ -9,10 +9,12 @@ import { CollectionPointCard } from "@/components/map/CollectionPointCard";
 import { PointDetailSheet } from "@/components/map/PointDetailSheet";
 import { kenyaCollectionPoints, NAIROBI_CENTER } from "@/data/kenyaCollectionPoints";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { LatLngExpression } from "leaflet";
 import { toast } from "sonner";
 
 export const MapPage = () => {
+  const { t } = useLanguage();
   const [selectedPoint, setSelectedPoint] = useState<CollectionPoint | null>(null);
   const [showList, setShowList] = useState(true);
   const [useSatellite, setUseSatellite] = useState(false);
@@ -41,10 +43,10 @@ export const MapPage = () => {
 
     if (isGpsActive) {
       setCenterOnUser(true);
-      toast.success(`Location found (±${Math.round(accuracy || 0)}m accuracy)`);
+      toast.success(`${t.locationFound} (±${Math.round(accuracy || 0)}m)`);
     } else {
       refresh();
-      toast.info("Getting your location...");
+      toast.info(t.gettingLocation);
     }
   };
 
@@ -71,7 +73,7 @@ export const MapPage = () => {
             variant="secondary"
             className="shadow-card"
             onClick={() => setUseSatellite(!useSatellite)}
-            title={useSatellite ? "Switch to Map" : "Switch to Satellite"}
+            title={useSatellite ? t.map : "Satellite"}
           >
             {useSatellite ? <MapIcon className="h-5 w-5" /> : <Satellite className="h-5 w-5" />}
           </Button>
@@ -80,7 +82,7 @@ export const MapPage = () => {
             variant={isGpsActive ? "default" : "secondary"}
             className={cn("shadow-card", isGpsActive && "gradient-primary")}
             onClick={handleLocateMe}
-            title="Find my location"
+            title={t.locateMe}
             disabled={loading}
           >
             {loading ? (
@@ -97,7 +99,7 @@ export const MapPage = () => {
             <MapPin className="h-5 w-5 text-primary" />
             <input
               type="text"
-              placeholder="Search collection points in Kenya..."
+              placeholder={t.searchPoints}
               className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
             />
           </div>
@@ -108,7 +110,7 @@ export const MapPage = () => {
           <div className="flex items-center gap-2 rounded-full bg-card px-3 py-1.5 shadow-card text-sm font-medium">
             <span className="text-lg">🇰🇪</span>
             <span className="text-foreground">
-              {isGpsActive ? "GPS Active" : "Kenya"}
+              {isGpsActive ? t.gpsActive : "Kenya"}
             </span>
             {isGpsActive && (
               <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -134,8 +136,8 @@ export const MapPage = () => {
 
         <div className="px-4 pb-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-foreground">Nearby Collection Points</h2>
-            <span className="text-sm text-muted-foreground">{kenyaCollectionPoints.length} found</span>
+            <h2 className="text-lg font-bold text-foreground">{t.nearbyPoints}</h2>
+            <span className="text-sm text-muted-foreground">{kenyaCollectionPoints.length} {t.found}</span>
           </div>
 
           <div className="mt-4 space-y-3 max-h-[40vh] overflow-y-auto">

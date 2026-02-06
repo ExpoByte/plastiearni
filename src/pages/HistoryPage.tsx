@@ -3,7 +3,7 @@ import { BottomNav } from "@/components/BottomNav";
 import { CollectionCard } from "@/components/CollectionCard";
 import { Button } from "@/components/ui/button";
 import { Filter, Calendar, TrendingUp, Weight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const allCollections = [
   { date: "Feb 4, 2026", location: "EcoRecycle Westlands, Nairobi", weight: 5.2, points: 520, status: "completed" as const },
@@ -14,14 +14,18 @@ const allCollections = [
   { date: "Jan 15, 2026", location: "Taka Taka Solutions, Industrial Area", weight: 6.0, points: 600, status: "pending" as const },
 ];
 
-const filters = ["All", "Completed", "Verified", "Pending"];
-
 export const HistoryPage = () => {
+  const { t } = useLanguage();
   const [activeFilter, setActiveFilter] = useState("All");
 
+  const filters = [t.all, t.completed, t.verified, t.pending];
+
   const filteredCollections = allCollections.filter((c) => {
-    if (activeFilter === "All") return true;
-    return c.status === activeFilter.toLowerCase();
+    if (activeFilter === t.all) return true;
+    if (activeFilter === t.completed) return c.status === "completed";
+    if (activeFilter === t.verified) return c.status === "verified";
+    if (activeFilter === t.pending) return c.status === "pending";
+    return true;
   });
 
   const totalWeight = allCollections.reduce((sum, c) => sum + c.weight, 0);
@@ -31,8 +35,8 @@ export const HistoryPage = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header className="bg-card px-6 pb-6 pt-8 shadow-soft">
-        <h1 className="text-2xl font-bold text-foreground">Collection History</h1>
-        <p className="text-sm text-muted-foreground">Track your environmental impact in Kenya</p>
+        <h1 className="text-2xl font-bold text-foreground">{t.collectionHistory}</h1>
+        <p className="text-sm text-muted-foreground">{t.trackImpact}</p>
 
         {/* Stats summary */}
         <div className="mt-6 grid grid-cols-2 gap-4">
@@ -41,7 +45,7 @@ export const HistoryPage = () => {
               <Weight className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Total Collected</p>
+              <p className="text-xs text-muted-foreground">{t.totalCollected}</p>
               <p className="text-lg font-bold text-foreground">{totalWeight.toFixed(1)} kg</p>
             </div>
           </div>
@@ -50,7 +54,7 @@ export const HistoryPage = () => {
               <TrendingUp className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Points (≈ KES)</p>
+              <p className="text-xs text-muted-foreground">{t.points} (≈ KES)</p>
               <p className="text-lg font-bold text-foreground">{totalPoints.toLocaleString()}</p>
             </div>
           </div>
@@ -88,7 +92,7 @@ export const HistoryPage = () => {
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
               <Calendar className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">No collections found</p>
+            <p className="text-muted-foreground">{t.noCollections}</p>
           </div>
         )}
       </main>

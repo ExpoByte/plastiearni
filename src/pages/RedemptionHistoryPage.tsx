@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { format } from "date-fns";
 
 interface Redemption {
@@ -30,36 +31,37 @@ interface Redemption {
   created_at: string;
 }
 
-const statusConfig = {
-  pending: {
-    label: "Pending",
-    icon: Clock,
-    className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  },
-  processing: {
-    label: "Processing",
-    icon: Loader2,
-    className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    animate: true,
-  },
-  success: {
-    label: "Completed",
-    icon: CheckCircle,
-    className: "bg-primary/10 text-primary",
-  },
-  failed: {
-    label: "Failed",
-    icon: XCircle,
-    className: "bg-destructive/10 text-destructive",
-  },
-};
-
 export const RedemptionHistoryPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+
+  const statusConfig = {
+    pending: {
+      label: t.pending,
+      icon: Clock,
+      className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+    },
+    processing: {
+      label: t.processing,
+      icon: Loader2,
+      className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      animate: true,
+    },
+    success: {
+      label: t.completed,
+      icon: CheckCircle,
+      className: "bg-primary/10 text-primary",
+    },
+    failed: {
+      label: t.failed,
+      icon: XCircle,
+      className: "bg-destructive/10 text-destructive",
+    },
+  };
 
   useEffect(() => {
     const fetchRedemptions = async () => {
@@ -92,6 +94,14 @@ export const RedemptionHistoryPage = () => {
     return phone.slice(0, 4) + "****" + phone.slice(-2);
   };
 
+  const filterOptions = [
+    { key: "all", label: t.all },
+    { key: "pending", label: t.pending },
+    { key: "processing", label: t.processing },
+    { key: "success", label: t.completed },
+    { key: "failed", label: t.failed },
+  ];
+
   return (
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
@@ -105,21 +115,21 @@ export const RedemptionHistoryPage = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">Redemption History</h1>
+          <h1 className="text-2xl font-bold">{t.redemptionHistory}</h1>
         </div>
-        <p className="text-sm opacity-80">Track your M-Pesa rewards</p>
+        <p className="text-sm opacity-80">{t.trackRewards}</p>
 
         {/* Stats summary */}
         <div className="mt-6 grid grid-cols-3 gap-3">
           <div className="rounded-xl bg-white/10 p-3 text-center backdrop-blur-sm">
             <p className="text-2xl font-bold">{redemptions.length}</p>
-            <p className="text-xs opacity-80">Total</p>
+            <p className="text-xs opacity-80">{t.total}</p>
           </div>
           <div className="rounded-xl bg-white/10 p-3 text-center backdrop-blur-sm">
             <p className="text-2xl font-bold">
               {redemptions.filter((r) => r.status === "success").length}
             </p>
-            <p className="text-xs opacity-80">Completed</p>
+            <p className="text-xs opacity-80">{t.completed}</p>
           </div>
           <div className="rounded-xl bg-white/10 p-3 text-center backdrop-blur-sm">
             <p className="text-2xl font-bold">
@@ -128,22 +138,22 @@ export const RedemptionHistoryPage = () => {
                 .reduce((sum, r) => sum + r.amount_kes, 0)
                 .toLocaleString()}
             </p>
-            <p className="text-xs opacity-80">KES Earned</p>
+            <p className="text-xs opacity-80">{t.kesEarned}</p>
           </div>
         </div>
       </header>
 
       {/* Filters */}
       <div className="flex gap-2 overflow-x-auto px-4 py-4 no-scrollbar -mt-4">
-        {["all", "pending", "processing", "success", "failed"].map((status) => (
+        {filterOptions.map((option) => (
           <Button
-            key={status}
-            variant={filter === status ? "default" : "glass"}
+            key={option.key}
+            variant={filter === option.key ? "default" : "glass"}
             size="sm"
-            onClick={() => setFilter(status)}
-            className="shrink-0 capitalize"
+            onClick={() => setFilter(option.key)}
+            className="shrink-0"
           >
-            {status === "all" ? "All" : statusConfig[status as keyof typeof statusConfig]?.label || status}
+            {option.label}
           </Button>
         ))}
       </div>
@@ -159,14 +169,14 @@ export const RedemptionHistoryPage = () => {
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
               <Clock className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-foreground">No redemptions yet</h3>
+            <h3 className="font-semibold text-foreground">{t.noRedemptions}</h3>
             <p className="mt-1 text-sm text-muted-foreground">
               {filter === "all"
-                ? "Your M-Pesa transactions will appear here"
-                : `No ${filter} transactions`}
+                ? t.trackRewards
+                : `${t.noRedemptions}`}
             </p>
             <Button className="mt-4" onClick={() => navigate("/rewards")}>
-              Browse Rewards
+              {t.browseRewards}
             </Button>
           </div>
         ) : (
@@ -192,7 +202,7 @@ export const RedemptionHistoryPage = () => {
                         </span>
                         <span className="flex items-center gap-1">
                           <Coins className="h-3.5 w-3.5" />
-                          {redemption.points_spent} pts
+                          {redemption.points_spent} {t.points}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3.5 w-3.5" />

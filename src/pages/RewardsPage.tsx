@@ -4,14 +4,12 @@ import { RewardCard } from "@/components/RewardCard";
 import { RedemptionDialog } from "@/components/RedemptionDialog";
 import { Button } from "@/components/ui/button";
 import { Smartphone, ShoppingBag, Banknote, Heart, Gift, Coins, Loader2, History } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-
-const categories = ["All", "Airtime", "Vouchers", "Cash", "Donate"];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const rewards = [
   {
@@ -107,11 +105,20 @@ interface SelectedReward {
 export const RewardsPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedReward, setSelectedReward] = useState<SelectedReward | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [userPoints, setUserPoints] = useState<number | null>(null);
   const [loadingPoints, setLoadingPoints] = useState(true);
+
+  const categories = [
+    { key: "All", label: t.all },
+    { key: "Airtime", label: t.airtime },
+    { key: "Vouchers", label: t.vouchers },
+    { key: "Cash", label: t.cash },
+    { key: "Donate", label: t.donate },
+  ];
 
   useEffect(() => {
     const fetchPoints = async () => {
@@ -176,8 +183,8 @@ export const RewardsPage = () => {
     <div className="min-h-screen bg-background pb-24">
       {/* Header */}
       <header className="gradient-hero px-6 pb-8 pt-8 text-primary-foreground">
-        <h1 className="text-2xl font-bold">Rewards</h1>
-        <p className="text-sm opacity-80">Exchange points for amazing rewards</p>
+        <h1 className="text-2xl font-bold">{t.rewards}</h1>
+        <p className="text-sm opacity-80">{t.exchangePoints}</p>
 
         {/* Points balance */}
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-white/10 p-5 backdrop-blur-sm">
@@ -186,7 +193,7 @@ export const RewardsPage = () => {
               <Coins className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm opacity-80">Available Points</p>
+              <p className="text-sm opacity-80">{t.availablePoints}</p>
               {loadingPoints ? (
                 <Loader2 className="h-6 w-6 animate-spin mt-1" />
               ) : (
@@ -202,7 +209,7 @@ export const RewardsPage = () => {
             size="icon"
             className="text-primary-foreground hover:bg-white/10"
             onClick={() => navigate("/redemption-history")}
-            title="Redemption History"
+            title={t.redemptionHistory}
           >
             <History className="h-6 w-6" />
           </Button>
@@ -213,13 +220,13 @@ export const RewardsPage = () => {
       <div className="flex gap-2 overflow-x-auto px-4 py-4 no-scrollbar -mt-4">
         {categories.map((category) => (
           <Button
-            key={category}
-            variant={activeCategory === category ? "default" : "glass"}
+            key={category.key}
+            variant={activeCategory === category.key ? "default" : "glass"}
             size="sm"
-            onClick={() => setActiveCategory(category)}
+            onClick={() => setActiveCategory(category.key)}
             className="shrink-0"
           >
-            {category}
+            {category.label}
           </Button>
         ))}
       </div>

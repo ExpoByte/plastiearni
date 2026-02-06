@@ -1,17 +1,19 @@
 import { Home, History, Gift, MapPin, User } from "lucide-react";
 import { useLocation, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { icon: Home, label: "Home", path: "/" },
-  { icon: History, label: "History", path: "/history" },
-  { icon: MapPin, label: "Map", path: "/map" },
-  { icon: Gift, label: "Rewards", path: "/rewards" },
-  { icon: User, label: "Profile", path: "/profile" },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const BottomNav = () => {
   const location = useLocation();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { icon: Home, label: t.home, path: "/" },
+    { icon: History, label: t.history, path: "/history" },
+    { icon: MapPin, label: t.map, path: "/map" },
+    { icon: Gift, label: t.rewards, path: "/rewards" },
+    { icon: User, label: t.profile, path: "/profile" },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass border-t border-border/50 px-2 pb-2 pt-2 animate-slide-in-bottom">
