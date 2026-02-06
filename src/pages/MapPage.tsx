@@ -8,7 +8,7 @@ import { CollectionPointCard } from "@/components/map/CollectionPointCard";
 import { PointDetailSheet } from "@/components/map/PointDetailSheet";
 import { kenyaCollectionPoints, NAIROBI_CENTER } from "@/data/kenyaCollectionPoints";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { LatLngExpression } from "leaflet";
+import type { LatLngExpression } from "leaflet";
 import { toast } from "sonner";
 
 export const MapPage = () => {
