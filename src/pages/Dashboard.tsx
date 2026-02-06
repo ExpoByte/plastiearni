@@ -1,4 +1,5 @@
-import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History, Loader2 } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
 import { StatCard } from "@/components/StatCard";
@@ -8,6 +9,9 @@ import { CollectionCard } from "@/components/CollectionCard";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/ui/button";
 import { Leaf, Droplet, TreeDeciduous } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const recentCollections = [
   {
@@ -34,10 +38,53 @@ const badges = [
 ];
 
 export const Dashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<{ display_name: string | null } | null>(null);
+  const [points, setPoints] = useState<{ balance: number; total_earned: number } | null>(null);
+
   const monthlyGoal = 50; // kg
-  const currentProgress = 32.5; // kg
+  const currentProgress = 32.5; // kg - This would come from a collections table in a full implementation
   const progressPercent = (currentProgress / monthlyGoal) * 100;
-  const pointsValue = 4850; // 1 point = 1 KES
+  const pointsValue = points?.balance ?? 0;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user) return;
+
+      const [profileRes, pointsRes] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("display_name")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("user_points")
+          .select("balance, total_earned")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+      ]);
+
+      if (profileRes.data) setProfile(profileRes.data);
+      if (pointsRes.data) setPoints(pointsRes.data);
+      setLoading(false);
+    };
+
+    fetchUserData();
+  }, [user]);
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const displayName = profile?.display_name || user?.email?.split("@")[0] || "User";
 
   return (
     <div className="min-h-screen bg-background pb-24">
@@ -46,10 +93,14 @@ export const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm opacity-80">Karibu,</p>
-            <h1 className="text-2xl font-bold">Wanjiku Mwangi</h1>
+            {loading ? (
+              <Loader2 className="h-6 w-6 animate-spin mt-1" />
+            ) : (
+              <h1 className="text-2xl font-bold">{displayName}</h1>
+            )}
           </div>
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
-            <span className="text-lg font-bold">WM</span>
+            <span className="text-lg font-bold">{getInitials(displayName)}</span>
           </div>
         </div>
 
@@ -57,10 +108,16 @@ export const Dashboard = () => {
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
           <div>
             <p className="text-sm opacity-80">Total Points</p>
-            <p className="text-3xl font-bold">{pointsValue.toLocaleString()}</p>
-            <p className="text-xs opacity-60">≈ KES {pointsValue.toLocaleString()}</p>
+            {loading ? (
+              <Loader2 className="h-6 w-6 animate-spin mt-1" />
+            ) : (
+              <>
+                <p className="text-3xl font-bold">{pointsValue.toLocaleString()}</p>
+                <p className="text-xs opacity-60">≈ KES {pointsValue.toLocaleString()}</p>
+              </>
+            )}
           </div>
-          <Button variant="glass" size="sm">
+          <Button variant="glass" size="sm" onClick={() => navigate("/rewards")}>
             Redeem
           </Button>
         </div>
