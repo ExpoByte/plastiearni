@@ -6,6 +6,8 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   optimizeDeps: {
+    // Include react-dom to ensure createPortal export is available
+    include: ["react-dom"],
     // Prevent Vite from pre-bundling Leaflet/react-leaflet; the optimized bundle can
     // mis-handle React Context and crash with: "render2 is not a function".
     exclude: ["leaflet", "react-leaflet", "@react-leaflet/core"],
