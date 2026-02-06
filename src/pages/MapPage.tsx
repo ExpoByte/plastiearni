@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { BottomNav } from "@/components/BottomNav";
+import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
 import { Button } from "@/components/ui/button";
 import { MapPin, Satellite, Map as MapIcon, Crosshair, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -157,6 +158,7 @@ export const MapPage = () => {
         />
       )}
 
+      <FloatingAssistantButton />
       <BottomNav />
     </div>
   );
