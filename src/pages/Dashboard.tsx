@@ -6,6 +6,7 @@ import { StatCard } from "@/components/StatCard";
 import { ProgressRing } from "@/components/ProgressRing";
 import { QuickAction } from "@/components/QuickAction";
 import { CollectionCard } from "@/components/CollectionCard";
+import { NewsSection } from "@/components/NewsSection";
 import { Badge } from "@/components/Badge";
 import { Button } from "@/components/ui/button";
 import { Leaf, Droplet, TreeDeciduous } from "lucide-react";
@@ -210,6 +211,9 @@ export const Dashboard = () => {
             <QuickAction icon={History} label="History" to="/history" color="primary" />
           </div>
         </div>
+
+        {/* News & Announcements */}
+        <NewsSection />
 
         {/* Badges */}
         <div className="mt-6">
