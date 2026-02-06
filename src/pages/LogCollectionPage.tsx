@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/BottomNav";
 import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Scale, MapPin, Package, Coins, Loader2, CheckCircle } from "lucide-react";
+import { ArrowLeft, Scale, MapPin, Package, Coins, Loader2, CheckCircle, Camera, Upload, X, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -34,8 +34,13 @@ export const LogCollectionPage = () => {
   const navigate = useNavigate();
   const { language } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [weight, setWeight] = useState("");
   const [plasticType, setPlasticType] = useState("mixed");
@@ -58,9 +63,70 @@ export const LogCollectionPage = () => {
     successMessage: language === "sw" ? "Umepata pointi" : "You've earned points",
     backToDashboard: language === "sw" ? "Rudi Nyumbani" : "Back to Dashboard",
     logAnother: language === "sw" ? "Rekodi Nyingine" : "Log Another",
+    photo: language === "sw" ? "Picha ya Uthibitisho" : "Verification Photo",
+    takePhoto: language === "sw" ? "Piga Picha" : "Take Photo",
+    uploadPhoto: language === "sw" ? "Pakia Picha" : "Upload Photo",
+    removePhoto: language === "sw" ? "Ondoa Picha" : "Remove Photo",
   };
 
   const calculatedPoints = weight ? Math.round(parseFloat(weight) * POINTS_PER_KG) : 0;
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error(language === "sw" ? "Tafadhali chagua picha" : "Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(language === "sw" ? "Picha ni kubwa sana (max 5MB)" : "Image is too large (max 5MB)");
+      return;
+    }
+
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
+  };
+
+  const uploadPhoto = async (): Promise<string | null> => {
+    if (!photoFile || !user) return null;
+
+    setUploading(true);
+    const fileExt = photoFile.name.split(".").pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("collection-photos")
+      .upload(fileName, photoFile);
+
+    setUploading(false);
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      toast.error(language === "sw" ? "Imeshindwa kupakia picha" : "Failed to upload photo");
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("collection-photos")
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,6 +144,12 @@ export const LogCollectionPage = () => {
 
     setLoading(true);
 
+    // Upload photo if provided
+    let photoUrl: string | null = null;
+    if (photoFile) {
+      photoUrl = await uploadPhoto();
+    }
+
     const { error } = await supabase.from("collections").insert({
       user_id: user.id,
       weight_kg: weightNum,
@@ -85,6 +157,7 @@ export const LogCollectionPage = () => {
       plastic_type: plasticType,
       location: location || null,
       notes: notes || null,
+      photo_url: photoUrl,
       status: "verified", // Auto-verify for now
     });
 
@@ -108,6 +181,7 @@ export const LogCollectionPage = () => {
     setLocation("");
     setNotes("");
     setEarnedPoints(0);
+    removePhoto();
   };
 
   if (success) {
@@ -217,6 +291,72 @@ export const LogCollectionPage = () => {
             />
           </div>
 
+          {/* Photo Upload Section */}
+          <div className="space-y-3">
+            <Label className="flex items-center gap-2">
+              <ImageIcon className="h-4 w-4 text-primary" />
+              {t.photo}
+            </Label>
+            
+            {photoPreview ? (
+              <div className="relative">
+                <img
+                  src={photoPreview}
+                  alt="Collection preview"
+                  className="w-full h-48 object-cover rounded-xl"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2"
+                  onClick={removePhoto}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                {/* Camera button (mobile) */}
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => cameraInputRef.current?.click()}
+                >
+                  <Camera className="mr-2 h-4 w-4" />
+                  {t.takePhoto}
+                </Button>
+
+                {/* File upload button */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  {t.uploadPhoto}
+                </Button>
+              </div>
+            )}
+          </div>
+
           {/* Points Preview */}
           <div className="rounded-2xl bg-primary/10 p-4">
             <p className="text-sm text-muted-foreground mb-1">{t.pointsPreview}</p>
@@ -231,12 +371,14 @@ export const LogCollectionPage = () => {
           <Button
             type="submit"
             className="w-full gradient-primary text-lg py-6"
-            disabled={loading || !weight}
+            disabled={loading || uploading || !weight}
           >
-            {loading ? (
+            {loading || uploading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                {language === "sw" ? "Inawasilisha..." : "Submitting..."}
+                {uploading 
+                  ? (language === "sw" ? "Inapakia picha..." : "Uploading photo...") 
+                  : (language === "sw" ? "Inawasilisha..." : "Submitting...")}
               </>
             ) : (
               t.submit
