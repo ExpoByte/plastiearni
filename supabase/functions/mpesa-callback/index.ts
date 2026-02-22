@@ -7,23 +7,32 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Validate callback secret token from query parameter
+    const url = new URL(req.url);
+    const providedSecret = url.searchParams.get("secret");
+    const expectedSecret = Deno.env.get("MPESA_CALLBACK_SECRET");
+
+    if (!expectedSecret || providedSecret !== expectedSecret) {
+      console.error("Invalid or missing callback secret");
+      return new Response(
+        JSON.stringify({ ResultCode: 1, ResultDesc: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const body = await req.json();
-    console.log("M-Pesa callback received:", JSON.stringify(body, null, 2));
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Parse M-Pesa B2C callback structure
     const result = body.Result;
     if (!result) {
-      console.error("Invalid callback structure - no Result field");
       return new Response(
         JSON.stringify({ ResultCode: 0, ResultDesc: "Accepted" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -34,28 +43,32 @@ Deno.serve(async (req) => {
     const resultCode = result.ResultCode;
     const resultDesc = result.ResultDesc;
 
-    console.log(`Processing callback: ConversationID=${conversationId}, ResultCode=${resultCode}`);
-
-    // Find the redemption by transaction ID
-    const { data: redemption, error: findError } = await supabase
-      .from("redemptions")
-      .select("*")
-      .eq("mpesa_transaction_id", conversationId)
-      .single();
-
-    if (findError || !redemption) {
-      console.error("Redemption not found for ConversationID:", conversationId);
+    if (!conversationId || typeof resultCode !== "number") {
+      console.error("Invalid callback payload structure");
       return new Response(
         JSON.stringify({ ResultCode: 0, ResultDesc: "Accepted" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Update redemption status based on result
+    // Find the redemption - must be in "processing" state to prevent replay
+    const { data: redemption, error: findError } = await supabase
+      .from("redemptions")
+      .select("*")
+      .eq("mpesa_transaction_id", conversationId)
+      .eq("status", "processing")
+      .single();
+
+    if (findError || !redemption) {
+      console.error("Redemption not found or already processed for:", conversationId);
+      return new Response(
+        JSON.stringify({ ResultCode: 0, ResultDesc: "Accepted" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const newStatus = resultCode === 0 ? "success" : "failed";
-    const updateData: Record<string, unknown> = {
-      status: newStatus,
-    };
+    const updateData: Record<string, unknown> = { status: newStatus };
 
     if (resultCode !== 0) {
       updateData.error_message = resultDesc;
@@ -83,9 +96,6 @@ Deno.serve(async (req) => {
       .update(updateData)
       .eq("id", redemption.id);
 
-    console.log(`Redemption ${redemption.id} updated to status: ${newStatus}`);
-
-    // Return success to M-Pesa
     return new Response(
       JSON.stringify({ ResultCode: 0, ResultDesc: "Accepted" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }

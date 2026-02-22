@@ -136,7 +136,7 @@ export const LogCollectionPage = () => {
       location: location || null,
       notes: notes || null,
       photo_url: photoUrl,
-      status: "verified", // Auto-verify for now
+      status: "pending", // Awaiting verification - points awarded server-side
     });
 
     setLoading(false);
