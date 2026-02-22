@@ -182,6 +182,7 @@ export interface Translations {
   deleteAnnouncementDesc: string;
   inactive: string;
   noAnnouncements: string;
+  users: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -367,6 +368,7 @@ export const translations: Record<Language, Translations> = {
     deleteAnnouncementDesc: "This action cannot be undone. The announcement will be permanently deleted.",
     inactive: "Inactive",
     noAnnouncements: "No announcements yet",
+    users: "Users",
   },
   sw: {
     // Navigation
@@ -550,5 +552,6 @@ export const translations: Record<Language, Translations> = {
     deleteAnnouncementDesc: "Kitendo hiki hakiwezi kutenduliwa. Tangazo litafutwa kabisa.",
     inactive: "Haifanyi Kazi",
     noAnnouncements: "Hakuna matangazo bado",
+    users: "Watumiaji",
   },
 };
