@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import { AnnouncementsManager } from "@/components/admin/AnnouncementsManager";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
   total_users: number;
@@ -22,6 +23,7 @@ interface AdminStats {
 export const AdminPage = () => {
   const navigate = useNavigate();
   const { isAdmin, loading: roleLoading } = useAdminRole();
+  const { t } = useLanguage();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
 
@@ -56,11 +58,9 @@ export const AdminPage = () => {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <Shield className="h-16 w-16 text-muted-foreground mb-4" />
-        <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
-        <p className="text-muted-foreground text-center mb-6">
-          You don't have permission to access the admin dashboard.
-        </p>
-        <Button onClick={() => navigate("/")}>Back to Home</Button>
+        <h1 className="text-2xl font-bold text-foreground mb-2">{t.accessDenied}</h1>
+        <p className="text-muted-foreground text-center mb-6">{t.noPermission}</p>
+        <Button onClick={() => navigate("/")}>{t.backToHome}</Button>
       </div>
     );
   }
@@ -74,13 +74,13 @@ export const AdminPage = () => {
           className="mb-4 flex items-center gap-2 opacity-80 hover:opacity-100"
         >
           <ArrowLeft className="h-5 w-5" />
-          <span>Back</span>
+          <span>{t.back}</span>
         </button>
         <div className="flex items-center gap-3">
           <Shield className="h-8 w-8" />
           <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-sm opacity-80">Manage your TakaPoints platform</p>
+            <h1 className="text-2xl font-bold">{t.adminDashboard}</h1>
+            <p className="text-sm opacity-80">{t.managePlatform}</p>
           </div>
         </div>
       </header>
@@ -88,8 +88,8 @@ export const AdminPage = () => {
       <main className="px-4 -mt-4">
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
+            <TabsTrigger value="overview">{t.overview}</TabsTrigger>
+            <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">

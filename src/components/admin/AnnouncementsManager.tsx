@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Pin, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AnnouncementForm } from "./AnnouncementForm";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +28,7 @@ interface Announcement {
 }
 
 export const AnnouncementsManager = () => {
+  const { t } = useLanguage();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
@@ -100,17 +102,17 @@ export const AnnouncementsManager = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-foreground">Manage Announcements</h2>
+        <h2 className="text-lg font-bold text-foreground">{t.manageAnnouncements}</h2>
         <Button onClick={() => setFormOpen(true)} size="sm">
           <Plus className="mr-2 h-4 w-4" />
-          New
+          {t.newAnnouncement}
         </Button>
       </div>
 
       <div className="space-y-3">
         {announcements.length === 0 ? (
           <div className="rounded-2xl bg-card p-6 text-center text-muted-foreground">
-            No announcements yet
+            {t.noAnnouncements}
           </div>
         ) : (
           announcements.map((announcement) => (
@@ -138,7 +140,7 @@ export const AnnouncementsManager = () => {
                     </span>
                     {!announcement.is_active && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                        Inactive
+                        {t.inactive}
                       </span>
                     )}
                   </div>
@@ -178,15 +180,14 @@ export const AnnouncementsManager = () => {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Announcement?</AlertDialogTitle>
+            <AlertDialogTitle>{t.deleteAnnouncement}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The announcement will be permanently
-              deleted.
+              {t.deleteAnnouncementDesc}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>{t.delete}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

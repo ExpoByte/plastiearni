@@ -161,6 +161,27 @@ export interface Translations {
   imageTooLarge: string;
   failedSubmit: string;
   collectionRecorded: string;
+
+  // Admin
+  adminDashboard: string;
+  managePlatform: string;
+  overview: string;
+  announcements: string;
+  manageAnnouncements: string;
+  newAnnouncement: string;
+  totalUsers: string;
+  pointsInCirculation: string;
+  plasticCollected: string;
+  collections: string;
+  redemptions: string;
+  activeAnnouncements: string;
+  accessDenied: string;
+  noPermission: string;
+  backToHome: string;
+  deleteAnnouncement: string;
+  deleteAnnouncementDesc: string;
+  inactive: string;
+  noAnnouncements: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -325,6 +346,27 @@ export const translations: Record<Language, Translations> = {
     imageTooLarge: "Image is too large (max 5MB)",
     failedSubmit: "Failed to submit collection",
     collectionRecorded: "Collection recorded!",
+
+    // Admin
+    adminDashboard: "Admin Dashboard",
+    managePlatform: "Manage your TakaPoints platform",
+    overview: "Overview",
+    announcements: "Announcements",
+    manageAnnouncements: "Manage Announcements",
+    newAnnouncement: "New",
+    totalUsers: "Total Users",
+    pointsInCirculation: "Points in Circulation",
+    plasticCollected: "Plastic Collected",
+    collections: "Collections",
+    redemptions: "Redemptions",
+    activeAnnouncements: "Active Announcements",
+    accessDenied: "Access Denied",
+    noPermission: "You don't have permission to access the admin dashboard.",
+    backToHome: "Back to Home",
+    deleteAnnouncement: "Delete Announcement?",
+    deleteAnnouncementDesc: "This action cannot be undone. The announcement will be permanently deleted.",
+    inactive: "Inactive",
+    noAnnouncements: "No announcements yet",
   },
   sw: {
     // Navigation
@@ -487,5 +529,26 @@ export const translations: Record<Language, Translations> = {
     imageTooLarge: "Picha ni kubwa sana (max 5MB)",
     failedSubmit: "Imeshindwa kuwasilisha",
     collectionRecorded: "Mkusanyiko umerekodiwa!",
+
+    // Admin
+    adminDashboard: "Dashibodi ya Msimamizi",
+    managePlatform: "Simamia jukwaa lako la TakaPoints",
+    overview: "Muhtasari",
+    announcements: "Matangazo",
+    manageAnnouncements: "Simamia Matangazo",
+    newAnnouncement: "Mpya",
+    totalUsers: "Watumiaji Wote",
+    pointsInCirculation: "Pointi Zinazotumika",
+    plasticCollected: "Plastiki Iliyokusanywa",
+    collections: "Makusanyo",
+    redemptions: "Zawadi Zilizokombolewa",
+    activeAnnouncements: "Matangazo Yanayofanya Kazi",
+    accessDenied: "Ufikiaji Umekataliwa",
+    noPermission: "Huna ruhusa ya kufikia dashibodi ya msimamizi.",
+    backToHome: "Rudi Nyumbani",
+    deleteAnnouncement: "Futa Tangazo?",
+    deleteAnnouncementDesc: "Kitendo hiki hakiwezi kutenduliwa. Tangazo litafutwa kabisa.",
+    inactive: "Haifanyi Kazi",
+    noAnnouncements: "Hakuna matangazo bado",
   },
 };
