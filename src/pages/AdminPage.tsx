@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import { AnnouncementsManager } from "@/components/admin/AnnouncementsManager";
+import { UsersManager } from "@/components/admin/UsersManager";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
@@ -87,8 +88,9 @@ export const AdminPage = () => {
 
       <main className="px-4 -mt-4">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">{t.overview}</TabsTrigger>
+            <TabsTrigger value="users">{t.users}</TabsTrigger>
             <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
           </TabsList>
 
@@ -100,6 +102,10 @@ export const AdminPage = () => {
             ) : (
               <AdminStatsCards stats={stats} />
             )}
+          </TabsContent>
+
+          <TabsContent value="users">
+            <UsersManager />
           </TabsContent>
 
           <TabsContent value="announcements">
