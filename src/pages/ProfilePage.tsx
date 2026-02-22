@@ -19,10 +19,12 @@ import {
   Award,
   Share2,
   Loader2,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 
@@ -42,6 +44,7 @@ interface Profile {
 
 export const ProfilePage = () => {
   const { user, signOut } = useAuth();
+  const { isAdmin } = useAdminRole();
   const { t } = useLanguage();
   const navigate = useNavigate();
   
@@ -109,6 +112,9 @@ export const ProfilePage = () => {
       case "invite":
         toast.info("Invite Friends coming soon!");
         break;
+      case "admin":
+        navigate("/admin");
+        break;
     }
   };
 
@@ -118,6 +124,7 @@ export const ProfilePage = () => {
     { icon: Settings, label: t.settings, action: "settings" },
     { icon: HelpCircle, label: t.helpSupport, action: "help" },
     { icon: Share2, label: t.inviteFriends, action: "invite" },
+    ...(isAdmin ? [{ icon: Shield, label: t.adminDashboard, action: "admin" }] : []),
   ];
 
   const displayName = profile?.display_name || user?.email?.split("@")[0] || "User";
