@@ -9,6 +9,18 @@ const corsHeaders = {
 // M-Pesa Daraja sandbox base URL
 const MPESA_API_URL = "https://sandbox.safaricom.co.ke";
 
+// Server-side reward tiers - single source of truth
+const REWARD_TIERS = [
+  { title: "KES 100 Airtime", points: 100, amount: 100, category: "airtime" },
+  { title: "KES 500 Airtime", points: 480, amount: 500, category: "airtime" },
+  { title: "KES 1,000 Naivas Voucher", points: 950, amount: 1000, category: "voucher" },
+  { title: "KES 2,500 Carrefour Voucher", points: 2400, amount: 2500, category: "voucher" },
+  { title: "KES 500 M-Pesa", points: 550, amount: 500, category: "cash" },
+  { title: "KES 2,000 M-Pesa", points: 2100, amount: 2000, category: "cash" },
+  { title: "Plant a Tree in Karura", points: 300, amount: 300, category: "donation" },
+  { title: "Clean Mombasa Beach", points: 500, amount: 500, category: "donation" },
+];
+
 interface RedeemRequest {
   phoneNumber: string;
   amount: number;
@@ -38,8 +50,6 @@ async function getAccessToken(): Promise<string> {
   );
 
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error("OAuth error:", errorText);
     throw new Error(`Failed to get M-Pesa access token: ${response.status}`);
   }
 
@@ -58,7 +68,7 @@ async function initiateB2CPayment(
     throw new Error("M-Pesa shortcode not configured");
   }
 
-  // Format phone number (remove leading 0 or +254, ensure starts with 254)
+  // Format phone number
   let formattedPhone = phoneNumber.replace(/\s/g, "");
   if (formattedPhone.startsWith("+")) {
     formattedPhone = formattedPhone.substring(1);
@@ -70,6 +80,9 @@ async function initiateB2CPayment(
     formattedPhone = "254" + formattedPhone;
   }
 
+  const callbackSecret = Deno.env.get("MPESA_CALLBACK_SECRET") || "";
+  const callbackUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/mpesa-callback?secret=${encodeURIComponent(callbackSecret)}`;
+
   const payload = {
     InitiatorName: "testapi",
     SecurityCredential: Deno.env.get("MPESA_PASSKEY") || "",
@@ -78,12 +91,10 @@ async function initiateB2CPayment(
     PartyA: shortcode,
     PartyB: formattedPhone,
     Remarks: "Taka Points Redemption",
-    QueueTimeOutURL: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mpesa-callback`,
-    ResultURL: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mpesa-callback`,
+    QueueTimeOutURL: callbackUrl,
+    ResultURL: callbackUrl,
     Occassion: "TakaReward",
   };
-
-  console.log("B2C Request payload:", JSON.stringify(payload, null, 2));
 
   const response = await fetch(`${MPESA_API_URL}/mpesa/b2c/v1/paymentrequest`, {
     method: "POST",
@@ -95,7 +106,6 @@ async function initiateB2CPayment(
   });
 
   const data = await response.json();
-  console.log("B2C Response:", JSON.stringify(data, null, 2));
 
   if (!response.ok || data.errorCode) {
     return {
@@ -111,7 +121,6 @@ async function initiateB2CPayment(
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -126,12 +135,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Get user from token
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
@@ -142,7 +149,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Parse request body
+    // Parse and validate request body
     const body: RedeemRequest = await req.json();
     const { phoneNumber, amount, rewardTitle, rewardCategory, pointsSpent } = body;
 
@@ -153,6 +160,32 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Validate phone number format (Kenyan)
+    const cleanPhone = phoneNumber.replace(/\s/g, "");
+    const phoneRegex = /^(?:\+254|254|0)?[17]\d{8}$/;
+    if (!phoneRegex.test(cleanPhone)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid phone number format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // SERVER-SIDE REWARD TIER VALIDATION
+    const matchedTier = REWARD_TIERS.find(
+      (t) => t.title === rewardTitle && t.points === pointsSpent && t.amount === amount && t.category === rewardCategory
+    );
+
+    if (!matchedTier) {
+      return new Response(
+        JSON.stringify({ error: "Invalid reward tier. The requested reward does not match any available tier." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Use server-validated values from here on
+    const validatedAmount = matchedTier.amount;
+    const validatedPoints = matchedTier.points;
+
     // Check user points balance
     const { data: pointsData, error: pointsError } = await supabase
       .from("user_points")
@@ -161,7 +194,6 @@ Deno.serve(async (req) => {
       .single();
 
     if (pointsError && pointsError.code !== "PGRST116") {
-      console.error("Error fetching points:", pointsError);
       return new Response(
         JSON.stringify({ error: "Failed to check points balance" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -169,7 +201,7 @@ Deno.serve(async (req) => {
     }
 
     const currentBalance = pointsData?.balance || 0;
-    if (currentBalance < pointsSpent) {
+    if (currentBalance < validatedPoints) {
       return new Response(
         JSON.stringify({ error: "Insufficient points balance" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -181,18 +213,17 @@ Deno.serve(async (req) => {
       .from("redemptions")
       .insert({
         user_id: user.id,
-        phone_number: phoneNumber,
-        amount_kes: amount,
-        points_spent: pointsSpent,
-        reward_title: rewardTitle,
-        reward_category: rewardCategory,
+        phone_number: cleanPhone,
+        amount_kes: validatedAmount,
+        points_spent: validatedPoints,
+        reward_title: matchedTier.title,
+        reward_category: matchedTier.category,
         status: "pending",
       })
       .select()
       .single();
 
     if (insertError) {
-      console.error("Error creating redemption:", insertError);
       return new Response(
         JSON.stringify({ error: "Failed to create redemption record" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -202,10 +233,9 @@ Deno.serve(async (req) => {
     // Get M-Pesa access token and initiate payment
     try {
       const accessToken = await getAccessToken();
-      const paymentResult = await initiateB2CPayment(accessToken, phoneNumber, amount);
+      const paymentResult = await initiateB2CPayment(accessToken, cleanPhone, validatedAmount);
 
       if (paymentResult.success) {
-        // Update redemption with transaction ID
         await supabase
           .from("redemptions")
           .update({
@@ -214,12 +244,12 @@ Deno.serve(async (req) => {
           })
           .eq("id", redemption.id);
 
-        // Deduct points from user balance
+        // Deduct points
         await supabase
           .from("user_points")
           .update({
-            balance: currentBalance - pointsSpent,
-            total_spent: (pointsData?.balance || 0) + pointsSpent,
+            balance: currentBalance - validatedPoints,
+            total_spent: (pointsData?.balance || 0) + validatedPoints,
           })
           .eq("user_id", user.id);
 
@@ -233,27 +263,17 @@ Deno.serve(async (req) => {
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } else {
-        // Update redemption as failed
         await supabase
           .from("redemptions")
-          .update({
-            status: "failed",
-            error_message: paymentResult.error,
-          })
+          .update({ status: "failed", error_message: paymentResult.error })
           .eq("id", redemption.id);
 
         return new Response(
-          JSON.stringify({
-            success: false,
-            error: paymentResult.error || "M-Pesa payment failed",
-          }),
+          JSON.stringify({ success: false, error: paymentResult.error || "M-Pesa payment failed" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     } catch (mpesaError) {
-      console.error("M-Pesa error:", mpesaError);
-      
-      // Update redemption as failed
       await supabase
         .from("redemptions")
         .update({
@@ -263,10 +283,7 @@ Deno.serve(async (req) => {
         .eq("id", redemption.id);
 
       return new Response(
-        JSON.stringify({
-          success: false,
-          error: "M-Pesa service error. Please try again later.",
-        }),
+        JSON.stringify({ success: false, error: "M-Pesa service error. Please try again later." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
