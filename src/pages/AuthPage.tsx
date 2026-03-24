@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { lovable } from "@/integrations/lovable";
+import { supabase } from "@/integrations/supabase/client";
 
 export const AuthPage = () => {
   const navigate = useNavigate();
