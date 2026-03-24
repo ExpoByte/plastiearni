@@ -89,6 +89,21 @@ export interface Translations {
   welcomeBack: string;
   checkEmail: string;
   turnTrashToTreasure: string;
+  forgotPassword: string;
+  forgotPasswordDesc: string;
+  sendResetLink: string;
+  resetEmailSent: string;
+  backToSignIn: string;
+  resetPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  setNewPassword: string;
+  passwordMinLength: string;
+  passwordsDoNotMatch: string;
+  passwordResetSuccess: string;
+  invalidResetLink: string;
+  invalidResetLinkDesc: string;
+  redirectingToDashboard: string;
   
   // Redemption
   redeemReward: string;
@@ -275,6 +290,21 @@ export const translations: Record<Language, Translations> = {
     welcomeBack: "Welcome back!",
     checkEmail: "Check your email to verify your account!",
     turnTrashToTreasure: "Turn trash into treasure",
+    forgotPassword: "Forgot password?",
+    forgotPasswordDesc: "Enter your email and we'll send you a link to reset your password.",
+    sendResetLink: "Send Reset Link",
+    resetEmailSent: "Password reset link sent! Check your email.",
+    backToSignIn: "Back to Sign In",
+    resetPassword: "Reset Password",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    setNewPassword: "Set your new password",
+    passwordMinLength: "Password must be at least 6 characters",
+    passwordsDoNotMatch: "Passwords do not match",
+    passwordResetSuccess: "Password reset successfully!",
+    invalidResetLink: "Invalid Reset Link",
+    invalidResetLinkDesc: "This password reset link is invalid or has expired. Please request a new one.",
+    redirectingToDashboard: "Redirecting to dashboard...",
     
     // Redemption
     redeemReward: "Redeem Reward",
@@ -459,6 +489,21 @@ export const translations: Record<Language, Translations> = {
     welcomeBack: "Karibu tena!",
     checkEmail: "Angalia barua pepe yako kuthibitisha akaunti!",
     turnTrashToTreasure: "Geuza takataka kuwa hazina",
+    forgotPassword: "Umesahau nenosiri?",
+    forgotPasswordDesc: "Ingiza barua pepe yako na tutakutumia kiungo cha kubadilisha nenosiri.",
+    sendResetLink: "Tuma Kiungo cha Kubadilisha",
+    resetEmailSent: "Kiungo cha kubadilisha nenosiri kimetumwa! Angalia barua pepe yako.",
+    backToSignIn: "Rudi Kuingia",
+    resetPassword: "Badilisha Nenosiri",
+    newPassword: "Nenosiri Jipya",
+    confirmPassword: "Thibitisha Nenosiri",
+    setNewPassword: "Weka nenosiri lako jipya",
+    passwordMinLength: "Nenosiri lazima liwe na herufi 6 au zaidi",
+    passwordsDoNotMatch: "Nenosiri hazilingani",
+    passwordResetSuccess: "Nenosiri limebadilishwa!",
+    invalidResetLink: "Kiungo Batili",
+    invalidResetLinkDesc: "Kiungo hiki cha kubadilisha nenosiri ni batili au kimekwisha muda. Tafadhali omba kingine.",
+    redirectingToDashboard: "Inaelekeza kwenye dashibodi...",
     
     // Redemption
     redeemReward: "Okoa Zawadi",
