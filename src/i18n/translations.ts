@@ -89,6 +89,21 @@ export interface Translations {
   welcomeBack: string;
   checkEmail: string;
   turnTrashToTreasure: string;
+  forgotPassword: string;
+  forgotPasswordDesc: string;
+  sendResetLink: string;
+  resetEmailSent: string;
+  backToSignIn: string;
+  resetPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  setNewPassword: string;
+  passwordMinLength: string;
+  passwordsDoNotMatch: string;
+  passwordResetSuccess: string;
+  invalidResetLink: string;
+  invalidResetLinkDesc: string;
+  redirectingToDashboard: string;
   
   // Redemption
   redeemReward: string;
