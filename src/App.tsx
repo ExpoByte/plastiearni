@@ -7,6 +7,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { AuthGuard } from "@/components/AuthGuard";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import AuthPage from "./pages/AuthPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import HistoryPage from "./pages/HistoryPage";
