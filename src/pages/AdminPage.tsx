@@ -8,6 +8,7 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import { AnnouncementsManager } from "@/components/admin/AnnouncementsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
+import { PhotosGallery } from "@/components/admin/PhotosGallery";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
@@ -88,9 +89,10 @@ export const AdminPage = () => {
 
       <main className="px-4 -mt-4">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">{t.overview}</TabsTrigger>
             <TabsTrigger value="users">{t.users}</TabsTrigger>
+            <TabsTrigger value="photos">Photos</TabsTrigger>
             <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
           </TabsList>
 
@@ -106,6 +108,10 @@ export const AdminPage = () => {
 
           <TabsContent value="users">
             <UsersManager />
+          </TabsContent>
+
+          <TabsContent value="photos">
+            <PhotosGallery />
           </TabsContent>
 
           <TabsContent value="announcements">
