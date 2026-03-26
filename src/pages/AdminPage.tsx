@@ -9,6 +9,10 @@ import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import { AnnouncementsManager } from "@/components/admin/AnnouncementsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { PhotosGallery } from "@/components/admin/PhotosGallery";
+import { CollectionsManager } from "@/components/admin/CollectionsManager";
+import { AdjustmentsReview } from "@/components/admin/AdjustmentsReview";
+import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
+import { FraudAlerts } from "@/components/admin/FraudAlerts";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
@@ -89,12 +93,18 @@ export const AdminPage = () => {
 
       <main className="px-4 -mt-4">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">{t.overview}</TabsTrigger>
-            <TabsTrigger value="users">{t.users}</TabsTrigger>
-            <TabsTrigger value="photos">Photos</TabsTrigger>
-            <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4">
+            <TabsList className="inline-flex w-auto min-w-full">
+              <TabsTrigger value="overview">{t.overview}</TabsTrigger>
+              <TabsTrigger value="collections">Ledger</TabsTrigger>
+              <TabsTrigger value="adjustments">Adjustments</TabsTrigger>
+              <TabsTrigger value="users">{t.users}</TabsTrigger>
+              <TabsTrigger value="photos">Photos</TabsTrigger>
+              <TabsTrigger value="audit">Audit</TabsTrigger>
+              <TabsTrigger value="fraud">Alerts</TabsTrigger>
+              <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="overview" className="space-y-6">
             {statsLoading ? (
@@ -106,12 +116,28 @@ export const AdminPage = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="collections">
+            <CollectionsManager />
+          </TabsContent>
+
+          <TabsContent value="adjustments">
+            <AdjustmentsReview />
+          </TabsContent>
+
           <TabsContent value="users">
             <UsersManager />
           </TabsContent>
 
           <TabsContent value="photos">
             <PhotosGallery />
+          </TabsContent>
+
+          <TabsContent value="audit">
+            <AuditLogViewer />
+          </TabsContent>
+
+          <TabsContent value="fraud">
+            <FraudAlerts />
           </TabsContent>
 
           <TabsContent value="announcements">
