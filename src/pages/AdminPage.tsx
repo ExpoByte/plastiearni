@@ -9,6 +9,10 @@ import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import { AnnouncementsManager } from "@/components/admin/AnnouncementsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { PhotosGallery } from "@/components/admin/PhotosGallery";
+import { CollectionsManager } from "@/components/admin/CollectionsManager";
+import { AdjustmentsReview } from "@/components/admin/AdjustmentsReview";
+import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
+import { FraudAlerts } from "@/components/admin/FraudAlerts";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
