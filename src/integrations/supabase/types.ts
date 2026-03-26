@@ -59,6 +59,107 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_type: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          record_id: string
+          table_name: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_type?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          record_id: string
+          table_name: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_type?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          record_id?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
+      collection_adjustments: {
+        Row: {
+          adjusted_kg: number
+          adjusted_points: number
+          admin_id: string
+          collection_id: string
+          created_at: string
+          delta_kg: number | null
+          delta_points: number | null
+          id: string
+          original_kg: number
+          original_points: number
+          reason: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          adjusted_kg: number
+          adjusted_points: number
+          admin_id: string
+          collection_id: string
+          created_at?: string
+          delta_kg?: number | null
+          delta_points?: number | null
+          id?: string
+          original_kg: number
+          original_points: number
+          reason: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          adjusted_kg?: number
+          adjusted_points?: number
+          admin_id?: string
+          collection_id?: string
+          created_at?: string
+          delta_kg?: number | null
+          delta_points?: number | null
+          id?: string
+          original_kg?: number
+          original_points?: number
+          reason?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_adjustments_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       collections: {
         Row: {
           created_at: string
@@ -100,6 +201,63 @@ export type Database = {
           weight_kg?: number
         }
         Relationships: []
+      }
+      fraud_flags: {
+        Row: {
+          created_at: string
+          description: string
+          flag_type: string
+          id: string
+          is_resolved: boolean
+          related_adjustment_id: string | null
+          related_collection_id: string | null
+          related_user_id: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          flag_type: string
+          id?: string
+          is_resolved?: boolean
+          related_adjustment_id?: string | null
+          related_collection_id?: string | null
+          related_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          flag_type?: string
+          id?: string
+          is_resolved?: boolean
+          related_adjustment_id?: string | null
+          related_collection_id?: string | null
+          related_user_id?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fraud_flags_related_adjustment_id_fkey"
+            columns: ["related_adjustment_id"]
+            isOneToOne: false
+            referencedRelation: "collection_adjustments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fraud_flags_related_collection_id_fkey"
+            columns: ["related_collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -243,6 +401,27 @@ export type Database = {
           total_points_earned: number
           total_redemptions: number
           total_users: number
+        }[]
+      }
+      get_collections_with_adjustments: {
+        Args: { p_limit?: number; p_offset?: number }
+        Returns: {
+          adjusted_kg: number
+          adjusted_points: number
+          adjustment_reason: string
+          adjustment_status: string
+          created_at: string
+          final_kg: number
+          final_points: number
+          has_adjustment: boolean
+          id: string
+          location: string
+          original_kg: number
+          original_points: number
+          photo_url: string
+          plastic_type: string
+          status: string
+          user_id: string
         }[]
       }
       has_role: {
