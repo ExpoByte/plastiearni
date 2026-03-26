@@ -8,6 +8,7 @@ import { useAdminRole } from "@/hooks/useAdminRole";
 import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import { AnnouncementsManager } from "@/components/admin/AnnouncementsManager";
 import { UsersManager } from "@/components/admin/UsersManager";
+import { PhotosGallery } from "@/components/admin/PhotosGallery";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
