@@ -110,6 +110,10 @@ export const AdminPage = () => {
             <UsersManager />
           </TabsContent>
 
+          <TabsContent value="photos">
+            <PhotosGallery />
+          </TabsContent>
+
           <TabsContent value="announcements">
             <AnnouncementsManager />
           </TabsContent>
