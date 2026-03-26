@@ -89,9 +89,10 @@ export const AdminPage = () => {
 
       <main className="px-4 -mt-4">
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">{t.overview}</TabsTrigger>
             <TabsTrigger value="users">{t.users}</TabsTrigger>
+            <TabsTrigger value="photos">Photos</TabsTrigger>
             <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
           </TabsList>
 
