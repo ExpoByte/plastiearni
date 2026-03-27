@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History, Loader2 } from "lucide-react";
+import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History, Loader2, QrCode } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
 import { StatCard } from "@/components/StatCard";
