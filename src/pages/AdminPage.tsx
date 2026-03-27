@@ -145,6 +145,10 @@ export const AdminPage = () => {
           <TabsContent value="announcements">
             <AnnouncementsManager />
           </TabsContent>
+
+          <TabsContent value="qr">
+            <QRGenerator />
+          </TabsContent>
         </Tabs>
       </main>
     </div>
