@@ -18,6 +18,7 @@ import MapPage from "./pages/MapPage";
 import ProfilePage from "./pages/ProfilePage";
 import AssistantPage from "./pages/AssistantPage";
 import AdminPage from "./pages/AdminPage";
+import ScanPage from "./pages/ScanPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -104,6 +105,14 @@ const App = () => (
             element={
               <AuthGuard>
                 <AdminPage />
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/scan"
+            element={
+              <AuthGuard>
+                <ScanPage />
               </AuthGuard>
             }
           />

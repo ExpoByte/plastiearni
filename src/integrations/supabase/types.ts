@@ -289,6 +289,54 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_transactions: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          location: string | null
+          notes: string | null
+          plastic_type: string
+          points: number
+          status: string
+          transaction_code: string
+          used_at: string | null
+          used_by: string | null
+          weight_kg: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          plastic_type?: string
+          points: number
+          status?: string
+          transaction_code?: string
+          used_at?: string | null
+          used_by?: string | null
+          weight_kg: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          plastic_type?: string
+          points?: number
+          status?: string
+          transaction_code?: string
+          used_at?: string | null
+          used_by?: string | null
+          weight_kg?: number
+        }
+        Relationships: []
+      }
       redemptions: {
         Row: {
           amount_kes: number

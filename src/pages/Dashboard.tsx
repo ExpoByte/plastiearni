@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History, Loader2 } from "lucide-react";
+import { Coins, Weight, Recycle, TrendingUp, Plus, MapPin, Gift, History, Loader2, QrCode } from "lucide-react";
 import { BottomNav } from "@/components/BottomNav";
 import { FloatingAssistantButton } from "@/components/FloatingAssistantButton";
 import { StatCard } from "@/components/StatCard";
@@ -208,7 +208,7 @@ export const Dashboard = () => {
           <h2 className="mb-4 text-lg font-bold text-foreground">{t.quickActions}</h2>
           <div className="grid grid-cols-4 gap-2">
             <QuickAction icon={Plus} label={t.logCollection} to="/log" color="primary" />
-            <QuickAction icon={MapPin} label={t.findPoints} to="/map" color="secondary" />
+            <QuickAction icon={QrCode} label="Scan QR" to="/scan" color="secondary" />
             <QuickAction icon={Gift} label={t.rewards} to="/rewards" color="accent" />
             <QuickAction icon={History} label={t.history} to="/history" color="primary" />
           </div>
