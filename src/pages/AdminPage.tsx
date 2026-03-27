@@ -13,6 +13,7 @@ import { CollectionsManager } from "@/components/admin/CollectionsManager";
 import { AdjustmentsReview } from "@/components/admin/AdjustmentsReview";
 import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
 import { FraudAlerts } from "@/components/admin/FraudAlerts";
+import { QRGenerator } from "@/components/admin/QRGenerator";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
