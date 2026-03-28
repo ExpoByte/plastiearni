@@ -106,6 +106,7 @@ export const AdminPage = () => {
               <TabsTrigger value="fraud">Alerts</TabsTrigger>
               <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
               <TabsTrigger value="qr">QR Codes</TabsTrigger>
+              <TabsTrigger value="pool">Reward Pool</TabsTrigger>
             </TabsList>
           </div>
 
