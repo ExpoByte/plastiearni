@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, QrCode, Loader2, CheckCircle, XCircle, Coins, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Html5Qrcode } from "html5-qrcode";
 
 type ScanState = "idle" | "scanning" | "processing" | "success" | "error";
 
@@ -24,60 +23,95 @@ export const ScanPage = () => {
   const { t } = useLanguage();
   const [state, setState] = useState<ScanState>("idle");
   const [result, setResult] = useState<ScanResult>({});
-  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const scanIntervalRef = useRef<number | null>(null);
   const processingRef = useRef(false);
+
+  const stopCamera = useCallback(() => {
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, []);
 
   const startScanning = async () => {
     setState("scanning");
-    try {
-      const scanner = new Html5Qrcode("qr-reader");
-      scannerRef.current = scanner;
+    processingRef.current = false;
 
-      await scanner.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        async (decodedText) => {
-          if (processingRef.current) return;
-          processingRef.current = true;
-          await handleScan(decodedText);
-        },
-        () => {} // Ignore scan failures (no QR found in frame)
-      );
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+
+      // Dynamically import the QR scanner library for decoding frames
+      const { BrowserQRCodeReader } = await import("@zxing/browser");
+      const reader = new BrowserQRCodeReader();
+
+      // Poll frames from the video for QR codes
+      scanIntervalRef.current = window.setInterval(async () => {
+        if (processingRef.current || !videoRef.current || !canvasRef.current) return;
+
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+
+        if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        try {
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          // Use luminance source approach
+          const result = await reader.decodeFromCanvas(canvas);
+          if (result) {
+            processingRef.current = true;
+            stopCamera();
+            await handleScan(result.getText());
+          }
+        } catch {
+          // No QR found in this frame — ignore
+        }
+      }, 300);
     } catch (err) {
       console.error("Camera error:", err);
-      toast.error("Could not access camera. Please grant camera permission.");
+      toast.error("Could not access camera. Please grant camera permission and try again.");
       setState("idle");
-    }
-  };
-
-  const stopScanning = async () => {
-    if (scannerRef.current?.isScanning) {
-      try {
-        await scannerRef.current.stop();
-      } catch (e) {
-        // Ignore
-      }
     }
   };
 
   useEffect(() => {
     return () => {
-      stopScanning();
+      stopCamera();
     };
-  }, []);
+  }, [stopCamera]);
 
   const handleScan = async (decodedText: string) => {
-    await stopScanning();
     setState("processing");
 
     try {
-      // Parse QR data
       let transactionCode: string;
       try {
         const parsed = JSON.parse(decodedText);
         transactionCode = parsed.code;
       } catch {
-        // Maybe it's just the raw code
         transactionCode = decodedText;
       }
 
@@ -119,7 +153,6 @@ export const ScanPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
       <header className="gradient-hero px-6 pb-8 pt-8 text-primary-foreground">
         <button
           onClick={() => navigate(-1)}
@@ -138,7 +171,9 @@ export const ScanPage = () => {
       </header>
 
       <main className="px-4 -mt-4">
-        {/* Idle State */}
+        {/* Hidden canvas for frame processing */}
+        <canvas ref={canvasRef} className="hidden" />
+
         {state === "idle" && (
           <div className="rounded-3xl bg-card p-8 shadow-card flex flex-col items-center text-center space-y-6">
             <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center">
@@ -157,17 +192,35 @@ export const ScanPage = () => {
           </div>
         )}
 
-        {/* Scanning State */}
         {state === "scanning" && (
           <div className="rounded-3xl bg-card p-4 shadow-card space-y-4">
-            <div id="qr-reader" className="rounded-2xl overflow-hidden" />
+            <div className="relative rounded-2xl overflow-hidden bg-black aspect-[4/3]">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                playsInline
+                muted
+                autoPlay
+              />
+              {/* Scanning overlay */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="w-56 h-56 border-2 border-primary rounded-2xl relative">
+                  <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-xl" />
+                  <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-xl" />
+                  <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-xl" />
+                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-xl" />
+                  {/* Animated scan line */}
+                  <div className="absolute left-2 right-2 h-0.5 bg-primary animate-pulse top-1/2" />
+                </div>
+              </div>
+            </div>
             <p className="text-center text-sm text-muted-foreground">
               Position the QR code within the frame
             </p>
             <Button
               variant="outline"
               onClick={() => {
-                stopScanning();
+                stopCamera();
                 setState("idle");
               }}
               className="w-full"
@@ -177,7 +230,6 @@ export const ScanPage = () => {
           </div>
         )}
 
-        {/* Processing State */}
         {state === "processing" && (
           <div className="rounded-3xl bg-card p-8 shadow-card flex flex-col items-center text-center space-y-4">
             <Loader2 className="h-16 w-16 animate-spin text-primary" />
@@ -186,7 +238,6 @@ export const ScanPage = () => {
           </div>
         )}
 
-        {/* Success State */}
         {state === "success" && (
           <div className="rounded-3xl bg-card p-8 shadow-card flex flex-col items-center text-center space-y-6 animate-fade-in">
             <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center">
@@ -213,7 +264,6 @@ export const ScanPage = () => {
           </div>
         )}
 
-        {/* Error State */}
         {state === "error" && (
           <div className="rounded-3xl bg-card p-8 shadow-card flex flex-col items-center text-center space-y-6 animate-fade-in">
             <div className="h-24 w-24 rounded-full bg-destructive/10 flex items-center justify-center">
