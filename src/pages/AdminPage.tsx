@@ -14,6 +14,7 @@ import { AdjustmentsReview } from "@/components/admin/AdjustmentsReview";
 import { AuditLogViewer } from "@/components/admin/AuditLogViewer";
 import { FraudAlerts } from "@/components/admin/FraudAlerts";
 import { QRGenerator } from "@/components/admin/QRGenerator";
+import { RewardPoolManager } from "@/components/admin/RewardPoolManager";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface AdminStats {
@@ -105,6 +106,7 @@ export const AdminPage = () => {
               <TabsTrigger value="fraud">Alerts</TabsTrigger>
               <TabsTrigger value="announcements">{t.announcements}</TabsTrigger>
               <TabsTrigger value="qr">QR Codes</TabsTrigger>
+              <TabsTrigger value="pool">Reward Pool</TabsTrigger>
             </TabsList>
           </div>
 
@@ -148,6 +150,10 @@ export const AdminPage = () => {
 
           <TabsContent value="qr">
             <QRGenerator />
+          </TabsContent>
+
+          <TabsContent value="pool">
+            <RewardPoolManager />
           </TabsContent>
         </Tabs>
       </main>

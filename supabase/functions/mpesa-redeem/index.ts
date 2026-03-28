@@ -230,6 +230,24 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Check reward pool balance before paying out
+    const { data: poolOk, error: poolError } = await supabase.rpc("deduct_reward_pool", {
+      p_amount: validatedAmount,
+      p_description: `Redemption: ${matchedTier.title} for user ${user.id.slice(0, 8)}`,
+    });
+
+    if (poolError || poolOk === false) {
+      await supabase
+        .from("redemptions")
+        .update({ status: "failed", error_message: "Insufficient reward pool funds" })
+        .eq("id", redemption.id);
+
+      return new Response(
+        JSON.stringify({ success: false, error: "Reward pool has insufficient funds. Please try again later." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Get M-Pesa access token and initiate payment
     try {
       const accessToken = await getAccessToken();
