@@ -259,6 +259,33 @@ export type Database = {
           },
         ]
       }
+      pool_transactions: {
+        Row: {
+          admin_id: string
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          type: string
+        }
+        Insert: {
+          admin_id: string
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          type?: string
+        }
+        Update: {
+          admin_id?: string
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -382,6 +409,24 @@ export type Database = {
         }
         Relationships: []
       }
+      reward_pool: {
+        Row: {
+          balance: number
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          balance?: number
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          balance?: number
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_points: {
         Row: {
           balance: number
@@ -438,6 +483,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      deduct_reward_pool: {
+        Args: { p_amount: number; p_description: string }
+        Returns: boolean
+      }
+      fund_reward_pool: {
+        Args: { p_admin_id: string; p_amount: number; p_description: string }
+        Returns: number
+      }
       get_admin_stats: {
         Args: never
         Returns: {
