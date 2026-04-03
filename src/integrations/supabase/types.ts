@@ -427,6 +427,45 @@ export type Database = {
         }
         Relationships: []
       }
+      stk_deposits: {
+        Row: {
+          admin_id: string
+          amount: number
+          checkout_request_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          mpesa_receipt: string | null
+          phone_number: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          amount: number
+          checkout_request_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          mpesa_receipt?: string | null
+          phone_number: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          amount?: number
+          checkout_request_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          mpesa_receipt?: string | null
+          phone_number?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_points: {
         Row: {
           balance: number
