@@ -21,12 +21,20 @@ async function getAccessToken(): Promise<string> {
   const secret = Deno.env.get("MPESA_CONSUMER_SECRET");
   if (!key || !secret) throw new Error("M-Pesa credentials not configured");
 
+  const credentials = btoa(`${key}:${secret}`);
+  console.log("Requesting M-Pesa access token...");
+  console.log("Key length:", key.length, "Secret length:", secret.length);
+  
   const res = await fetch(
     `${MPESA_API_URL}/oauth/v1/generate?grant_type=client_credentials`,
-    { headers: { Authorization: `Basic ${btoa(`${key}:${secret}`)}` } }
+    { headers: { Authorization: `Basic ${credentials}` } }
   );
-  if (!res.ok) throw new Error(`Failed to get access token: ${res.status}`);
-  return (await res.json()).access_token;
+  
+  const body = await res.text();
+  console.log("Token response status:", res.status, "body:", body);
+  
+  if (!res.ok) throw new Error(`Failed to get access token: ${res.status} - ${body}`);
+  return JSON.parse(body).access_token;
 }
 
 Deno.serve(async (req) => {
